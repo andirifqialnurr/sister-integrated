@@ -33,7 +33,7 @@ turunan dari [schema.md](./schema.md), [architecture.md](./architecture.md),
 - Theme: `src/const/theme.ts`, primary hijau, chart ApexCharts.
 - Module awal read-only: `src/modules/pegawai/`, `src/modules/referensi/`,
   `src/modules/bkd/`, `src/modules/penugasan/`, dan
-  `src/modules/pendidikan_formal/`.
+  `src/modules/pendidikan_formal/`, serta `src/modules/riwayat_pekerjaan/`.
 - Security contract: `security.md`, dengan `security_audit_event` terpisah dari
   `sister_operation`.
 
@@ -218,6 +218,29 @@ DELETE, ajuan, pagination, dan binary download belum dibuka.
 - [ ] Response live Pendidikan Formal belum diuji karena credential dan UAT
       belum tersedia.
 
+## Riwayat pekerjaan read-only checkpoint: 2026-09-17
+
+Checkpoint ini hanya mencakup `GET /riwayat_pekerjaan` dan
+`GET /riwayat_pekerjaan/{id}` pada PDF halaman 260-263. Endpoint POST, PUT,
+DELETE, pagination, dan binary download belum dibuka.
+
+- [x] Schema runtime list mengikuti 9 field response `/riwayat_pekerjaan` dan
+      query wajib `id_sdm` bertipe UUID.
+- [x] Schema runtime detail mengikuti 9 field list ditambah field detail
+      `id_sdm`, `id_bidang_usaha`, `id_jenis_pekerjaan`, `deskripsi_kerja`,
+      dan metadata dokumen.
+- [x] Adapter live memakai path tetap dan hanya mengirim query `id_sdm` pada
+      list; detail memakai ID path hasil list.
+- [x] Fixture, service safe DTO, protected tRPC procedures, dan route
+      `/riwayat_pekerjaan` serta
+      `/riwayat_pekerjaan/{id_riwayat_pekerjaan}` tersedia dalam folder module
+      `riwayat_pekerjaan`.
+- [x] UI memilih SDM dari `/referensi/sdm`, membedakan loading, empty, error,
+      unauthorized, forbidden, not found, dan source.
+- [x] Test schema, adapter, service, dan router lulus.
+- [ ] Response live Riwayat Pekerjaan belum diuji karena credential dan UAT
+      belum tersedia.
+
 ## 0. Gate kontrak eksternal
 
 - [ ] Identifikasi perguruan tinggi target dan instance SISTER yang akan dipakai.
@@ -366,6 +389,7 @@ Scope awal yang disarankan:
 - [x] GET /data_pribadi/kepegawaian/{id_sdm}.
 - [x] GET /penugasan dengan detail bila dibutuhkan.
 - [x] GET /pendidikan_formal dan detailnya.
+- [x] GET /riwayat_pekerjaan dan detailnya.
 - [x] GET /bkd/laporan_akhir_bkd.
 - [x] GET /bkd/pendidikan, /ajar, /tunjang, /pengmas, dan /penelitian.
 - [ ] GET satu atau lebih referensi bertingkat yang dibutuhkan halaman.
@@ -465,7 +489,7 @@ jelas dan memiliki UAT:
 - [ ] Penghargaan.
 - [ ] Penunjang Lain.
 - [ ] Publikasi.
-- [ ] Riwayat Pekerjaan.
+- [x] Riwayat Pekerjaan.
 - [ ] Sertifikasi Profesi.
 - [ ] Nilai Tes dan ajuan.
 - [ ] Tugas Tambahan.

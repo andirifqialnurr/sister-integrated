@@ -202,6 +202,45 @@ export const pendidikanFormalDetailSchema = pendidikanFormalBaseSchema
   })
   .passthrough();
 
+export const riwayatPekerjaanDocumentSchema = z
+  .object({
+    id: z.string().min(1),
+    nama: z.string(),
+    jenis_dokumen: z.string(),
+    nama_file: z.string(),
+    jenis_file: z.string(),
+    tanggal_upload: z.string(),
+    tautan: z.string(),
+    keterangan: z.string(),
+  })
+  .passthrough();
+
+const riwayatPekerjaanBaseSchema = z.object({
+  id: z.string().min(1),
+  jenis_pekerjaan: z.string(),
+  nama_jabatan: z.string(),
+  instansi: z.string(),
+  divisi: z.string(),
+  mulai_bekerja: z.string(),
+  selesai_bekerja: z.string(),
+  luar_negeri: z.boolean(),
+  bidang_usaha: z.string(),
+});
+
+export const riwayatPekerjaanSummarySchema = riwayatPekerjaanBaseSchema.passthrough();
+
+export const riwayatPekerjaanSummaryListSchema = z.array(riwayatPekerjaanSummarySchema);
+
+export const riwayatPekerjaanDetailSchema = riwayatPekerjaanBaseSchema
+  .extend({
+    id_sdm: z.string(),
+    id_bidang_usaha: z.number().int(),
+    id_jenis_pekerjaan: z.number().int(),
+    deskripsi_kerja: z.string(),
+    dokumen: z.array(riwayatPekerjaanDocumentSchema),
+  })
+  .passthrough();
+
 export type SdmSummary = z.infer<typeof sdmSummarySchema>;
 export type SdmProfile = z.infer<typeof sdmProfileSchema>;
 export type SdmEmployment = z.infer<typeof sdmEmploymentSchema>;
@@ -214,3 +253,6 @@ export type PenugasanDetail = z.infer<typeof penugasanDetailSchema>;
 export type PendidikanFormalDocument = z.infer<typeof pendidikanFormalDocumentSchema>;
 export type PendidikanFormalSummary = z.infer<typeof pendidikanFormalSummarySchema>;
 export type PendidikanFormalDetail = z.infer<typeof pendidikanFormalDetailSchema>;
+export type RiwayatPekerjaanDocument = z.infer<typeof riwayatPekerjaanDocumentSchema>;
+export type RiwayatPekerjaanSummary = z.infer<typeof riwayatPekerjaanSummarySchema>;
+export type RiwayatPekerjaanDetail = z.infer<typeof riwayatPekerjaanDetailSchema>;

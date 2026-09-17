@@ -30,6 +30,9 @@ evidence auditnya.
 - Read-only formal education module mencakup `/pendidikan_formal` dan
   `/pendidikan_formal/{id}`; keduanya tetap membaca source of truth SISTER dan
   belum dipersist ke database lokal.
+- Read-only work history module mencakup `/riwayat_pekerjaan` dan
+  `/riwayat_pekerjaan/{id}`; keduanya tetap membaca source of truth SISTER dan
+  belum dipersist ke database lokal.
 
 ## Cara mengadaptasi dokumen
 
@@ -463,6 +466,43 @@ Object pada `dokumen` memiliki 8 field string: `id`, `nama`, `jenis_dokumen`,
 Schema list dan detail sengaja dipisahkan karena PDF mendokumentasikan tipe
 `jenis_ajuan` yang berbeda pada kedua response. Tidak ada pagination pada kedua
 GET tersebut, dan binary download dokumen belum dibuka pada slice ini.
+
+### 3.7 Riwayat pekerjaan
+
+Kontrak berikut berasal dari halaman PDF 260-263 dan menjadi batas modul
+`riwayat_pekerjaan` read-only pada slice ini. Endpoint POST, PUT, dan DELETE
+berada di luar scope implementasi awal.
+
+`GET /riwayat_pekerjaan` menerima query wajib `id_sdm` bertipe UUID dan
+mengembalikan array object dengan 9 field:
+
+| Field | Tipe PDF | Keterangan |
+| --- | --- | --- |
+| id | string | ID riwayat pekerjaan |
+| jenis_pekerjaan | string | Jenis pekerjaan |
+| nama_jabatan | string | Nama jabatan |
+| instansi | string | Instansi |
+| divisi | string | Divisi |
+| mulai_bekerja | string | Tanggal mulai bekerja |
+| selesai_bekerja | string | Tanggal selesai bekerja |
+| luar_negeri | boolean | True jika pekerjaan di luar negeri |
+| bidang_usaha | string | Bidang usaha |
+
+`GET /riwayat_pekerjaan/{id}` menerima path `id` bertipe UUID dan
+mengembalikan object detail dengan 9 field list di atas serta field tambahan:
+
+| Field | Tipe PDF | Keterangan |
+| --- | --- | --- |
+| id_sdm | string | ID SDM pemilik data |
+| id_bidang_usaha | integer | ID bidang usaha |
+| id_jenis_pekerjaan | integer | ID jenis pekerjaan |
+| deskripsi_kerja | string | Deskripsi kerja |
+| dokumen | array | Metadata dokumen yang menyertai data |
+
+Object pada `dokumen` memiliki 8 field string: `id`, `nama`, `jenis_dokumen`,
+`nama_file`, `jenis_file`, `tanggal_upload`, `tautan`, dan `keterangan`.
+Tidak ada pagination pada kedua GET tersebut, dan binary download dokumen belum
+dibuka pada slice ini.
 
 ## 4. Inventaris domain SISTER
 

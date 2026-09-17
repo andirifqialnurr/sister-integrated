@@ -1,6 +1,7 @@
 import Link from "next/link";
 import {
   BarChart3,
+  BriefcaseBusiness,
   ClipboardCheck,
   ClipboardList,
   FileText,
@@ -16,7 +17,7 @@ import { cn } from "@/lib/cn";
 
 type NavigationItem = {
   label: string;
-  href: "/" | "/pegawai" | "/referensi" | "/bkd" | "/penugasan" | "/pendidikan_formal" | "/audit" | "#pengajuan" | "#dokumen";
+  href: "/" | "/pegawai" | "/referensi" | "/bkd" | "/penugasan" | "/pendidikan_formal" | "/riwayat_pekerjaan" | "/audit" | "#pengajuan" | "#dokumen";
   icon: LucideIcon;
 };
 
@@ -27,6 +28,7 @@ const navigationItems: NavigationItem[] = [
   { label: "BKD", href: "/bkd", icon: BarChart3 },
   { label: "Penugasan", href: "/penugasan", icon: ClipboardList },
   { label: "Pendidikan Formal", href: "/pendidikan_formal", icon: GraduationCap },
+  { label: "Riwayat Pekerjaan", href: "/riwayat_pekerjaan", icon: BriefcaseBusiness },
   { label: "Pengajuan", href: "#pengajuan", icon: FileText },
   { label: "Audit security", href: "/audit", icon: ShieldCheck },
 ];

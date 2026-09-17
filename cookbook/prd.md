@@ -20,8 +20,8 @@ merupakan bagian dari product scope.
 - Sumber batas capability: [SISTER Web Service PT.pdf](../SISTER%20Web%20Service%20PT.pdf).
 - Scope reference: 236 endpoint unik dalam 39 domain; tidak seluruhnya masuk
   release pertama.
-- Module awal read-only: `pegawai`, `referensi`, `bkd`, `penugasan`, dan
-  `pendidikan_formal`, dengan page, API
+- Module awal read-only: `pegawai`, `referensi`, `bkd`, `penugasan`,
+  `pendidikan_formal`, dan `riwayat_pekerjaan`, dengan page, API
   procedure, service, schema, widget, dan repository khusus (bila dibutuhkan)
   berada di folder module masing-masing.
 - Internal API: tRPC typed API; upload multipart dan download binary memakai
@@ -203,6 +203,9 @@ Modul Pendidikan Formal read-only mencakup list dan detail sesuai halaman PDF
 153-158. Endpoint POST, PUT, DELETE, dan ajuan pendidikan formal belum termasuk
 release slice ini.
 
+Modul Riwayat Pekerjaan read-only mencakup list dan detail sesuai halaman PDF
+260-263. Endpoint POST, PUT, dan DELETE belum termasuk release slice ini.
+
 ### 7.2 Release pertama: UI
 
 - login aplikasi atau auth boundary sesuai keputusan;
@@ -367,6 +370,22 @@ Acceptance:
   state yang berbeda;
 - tidak ada create, edit, delete, ajuan, pagination, atau binary download pada
   slice ini.
+
+### FR-06c Riwayat pekerjaan
+
+User dapat memilih SDM dan melihat daftar serta detail riwayat pekerjaan.
+
+Acceptance:
+
+- list memanggil `GET /riwayat_pekerjaan` dengan `id_sdm` dari `/referensi/sdm`;
+- detail memanggil `GET /riwayat_pekerjaan/{id}` dengan ID yang berasal dari
+  hasil list;
+- field list dan detail mengikuti kontrak PDF halaman 260-263, termasuk
+  metadata `dokumen` pada detail;
+- empty, error, unauthorized, forbidden, dan not found ditampilkan sebagai
+  state yang berbeda;
+- tidak ada create, edit, delete, pagination, atau binary download pada slice
+  ini.
 
 ### FR-06 Reference options
 

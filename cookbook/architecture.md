@@ -21,7 +21,8 @@ bersifat portable. Bagian `Project Profile` berisi keputusan untuk repository
   chart ApexCharts.
 - Module convention: setiap fitur memiliki satu folder module, misalnya
   `src/modules/pegawai/`, `src/modules/referensi/`, `src/modules/bkd/`,
-  `src/modules/penugasan/`, atau `src/modules/pendidikan_formal/` dengan
+  `src/modules/penugasan/`, `src/modules/pendidikan_formal/`, atau
+  `src/modules/riwayat_pekerjaan/` dengan
   subfolder `page/`, `api/`, dan `widget/` sesuai kebutuhan.
 
 Pada project lain, ganti external system, framework, persistence, theme, dan
@@ -230,6 +231,14 @@ Mapping untuk project `sister-integrated`:
       -> src/modules/pendidikan_formal/widget/pendidikan_formal_workspace_widget.tsx
       -> src/app/pendidikan_formal/[id_pendidikan_formal]/page.tsx (route detail)
 
+    src/app/riwayat_pekerjaan/page.tsx
+      -> src/modules/riwayat_pekerjaan/page/riwayat_pekerjaan_page.tsx
+      -> src/modules/riwayat_pekerjaan/api/riwayat_pekerjaan_router.ts
+      -> src/modules/riwayat_pekerjaan/api/riwayat_pekerjaan_service.ts
+      -> src/modules/riwayat_pekerjaan/api/riwayat_pekerjaan_adapter.ts
+      -> src/modules/riwayat_pekerjaan/widget/riwayat_pekerjaan_workspace_widget.tsx
+      -> src/app/riwayat_pekerjaan/[id_riwayat_pekerjaan]/page.tsx (route detail)
+
 Aturan folder:
 
 1. Folder `app/` hanya berisi route entry Next.js, loading/error boundary, dan
@@ -331,6 +340,8 @@ Capability tRPC yang disiapkan untuk MVP, bukan daftar final seluruh endpoint:
     penugasan.get_detail    query
     pendidikan_formal.list       query
     pendidikan_formal.get_detail query
+    riwayat_pekerjaan.list       query
+    riwayat_pekerjaan.get_detail query
     operation.get           query
     submission.get_status   query
     pegawai.update_data     mutation
@@ -450,6 +461,12 @@ list. Detail memakai ID pendidikan formal dari hasil list dan divalidasi ulang
 sebagai UUID di procedure. Schema list dan detail terpisah karena tipe
 `jenis_ajuan` pada PDF berbeda; detail hanya menampilkan metadata dokumen dan
 belum menyediakan binary download, cache, atau mutation.
+
+Modul Riwayat Pekerjaan memakai `id_sdm` hasil pilihan `/referensi/sdm` untuk
+list. Detail memakai ID riwayat pekerjaan dari hasil list dan divalidasi ulang
+sebagai UUID di procedure. Slice ini hanya membuka GET list/detail sesuai PDF
+halaman 260-263; dokumen hanya ditampilkan sebagai metadata, tanpa binary
+download, cache, atau mutation.
 
 ## 8. Alur write dan update penuh
 
