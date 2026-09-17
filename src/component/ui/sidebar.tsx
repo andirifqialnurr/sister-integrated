@@ -13,14 +13,14 @@ import { cn } from "@/lib/cn";
 
 type NavigationItem = {
   label: string;
-  href: "/" | "/pegawai" | "/audit" | "#referensi" | "#pengajuan" | "#dokumen";
+  href: "/" | "/pegawai" | "/referensi" | "/audit" | "#pengajuan" | "#dokumen";
   icon: LucideIcon;
 };
 
 const navigationItems: NavigationItem[] = [
   { label: "Ikhtisar", href: "/", icon: LayoutDashboard },
   { label: "Pegawai", href: "/pegawai", icon: UsersRound },
-  { label: "Referensi", href: "#referensi", icon: ClipboardCheck },
+  { label: "Referensi", href: "/referensi", icon: ClipboardCheck },
   { label: "Pengajuan", href: "#pengajuan", icon: FileText },
   { label: "Audit security", href: "/audit", icon: ShieldCheck },
 ];

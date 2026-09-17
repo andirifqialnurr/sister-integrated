@@ -31,7 +31,7 @@ turunan dari [schema.md](./schema.md), [architecture.md](./architecture.md),
 - Shared primitive: `src/component/ui/`.
 - Shared composite: `src/component/widget/`.
 - Theme: `src/const/theme.ts`, primary hijau, chart ApexCharts.
-- Module awal: `src/modules/pegawai/`.
+- Module awal read-only: `src/modules/pegawai/` dan `src/modules/referensi/`.
 - Security contract: `security.md`, dengan `security_audit_event` terpisah dari
   `sister_operation`.
 
@@ -133,6 +133,24 @@ lokal dan tidak mengubah database SISTER.
 - [x] Unit test configuration status dan procedure overview lulus.
 - [ ] Health check live `/authorize` belum dijalankan otomatis; perlu aksi
       eksplisit setelah credential UAT dan kebijakan maintenance dikonfirmasi.
+
+## Referensi read-only checkpoint: 2026-09-17
+
+Checkpoint ini hanya mencakup dua endpoint yang field dan metodenya sudah
+terbaca jelas dari PDF. Tidak ada endpoint referensi lain yang ikut dibuka.
+
+- [x] Schema runtime `/referensi/profil_pt` mengikuti 14 field pada PDF
+      halaman 249 dan response array object.
+- [x] Schema runtime `/referensi/semester` mengikuti `id` integer dan `nama`
+      string pada PDF halaman 257-258.
+- [x] Adapter live memakai path tetap tanpa query parameter arbitrary.
+- [x] Fixture adapter, service safe DTO, dan protected tRPC procedure tersedia
+      di `src/modules/referensi/`.
+- [x] Halaman `/referensi` memiliki state loading, empty, error, source, dan
+      refresh manual; tidak ada UI mutation.
+- [x] Test adapter, schema, service, dan router lulus.
+- [ ] Response live instance SISTER belum diuji karena credential dan UAT
+      belum tersedia.
 
 ## 0. Gate kontrak eksternal
 

@@ -47,6 +47,38 @@ export const sdmEmploymentSchema = z
   })
   .passthrough();
 
+export const profilPtSchema = z
+  .object({
+    id: z.string(),
+    kode_perguruan_tinggi: z.string(),
+    nama_perguruan_tinggi: z.string(),
+    telepon: z.string(),
+    faximile: z.string(),
+    email: z.string(),
+    website: z.string(),
+    jalan: z.string(),
+    dusun: z.string(),
+    rt: z.number().int(),
+    rw: z.number().int(),
+    kelurahan: z.string(),
+    kode_pos: z.string(),
+    id_wilayah: z.string(),
+  })
+  .passthrough();
+
+export const profilPtListSchema = z.array(profilPtSchema);
+
+export const semesterSchema = z
+  .object({
+    id: z.number().int(),
+    nama: z.string(),
+  })
+  .passthrough();
+
+export const semesterListSchema = z.array(semesterSchema);
+
 export type SdmSummary = z.infer<typeof sdmSummarySchema>;
 export type SdmProfile = z.infer<typeof sdmProfileSchema>;
 export type SdmEmployment = z.infer<typeof sdmEmploymentSchema>;
+export type ProfilPt = z.infer<typeof profilPtSchema>;
+export type Semester = z.infer<typeof semesterSchema>;

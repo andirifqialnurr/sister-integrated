@@ -20,8 +20,9 @@ merupakan bagian dari product scope.
 - Sumber batas capability: [SISTER Web Service PT.pdf](../SISTER%20Web%20Service%20PT.pdf).
 - Scope reference: 236 endpoint unik dalam 39 domain; tidak seluruhnya masuk
   release pertama.
-- Module awal: `pegawai`, dengan seluruh page, API procedure, service, schema,
-  widget, dan repository khusus berada di `src/modules/pegawai/`.
+- Module awal read-only: `pegawai` dan `referensi`, dengan page, API procedure,
+  service, schema, widget, dan repository khusus (bila dibutuhkan) berada di
+  folder module masing-masing.
 - Internal API: tRPC typed API; upload multipart dan download binary memakai
   Route Handler khusus.
 - Local persistence: PostgreSQL + Prisma untuk metadata aplikasi; table dan
@@ -183,6 +184,12 @@ lokasinya tanpa mengubah acceptance criteria yang memang relevan.
 - referensi bertingkat yang dipakai pada halaman;
 - audit read yang perlu untuk diagnosis tanpa menyimpan PII penuh.
 
+Implementasi repository saat ini telah menyediakan vertical slice referensi
+read-only untuk `GET /referensi/profil_pt` dan `GET /referensi/semester`.
+Keduanya tetap memakai fixture di development sampai credential dan instance
+UAT dikonfirmasi; implementasi lokal tidak boleh dianggap sebagai bukti bahwa
+response instance produksi sudah tervalidasi.
+
 ### 7.2 Release pertama: UI
 
 - login aplikasi atau auth boundary sesuai keputusan;
@@ -319,6 +326,15 @@ Acceptance:
 - label dan ID disimpan bersama pilihan;
 - cache diberi timestamp;
 - error refresh referensi tidak disamakan dengan option kosong.
+
+Untuk capability yang sudah dipilih pada release awal:
+
+- `GET /referensi/profil_pt` tidak menerima parameter dan hanya menampilkan
+  field yang tercantum pada PDF halaman 249;
+- `GET /referensi/semester` tidak menerima parameter, memakai `id` integer
+  dan `nama` string sesuai PDF halaman 257-258;
+- response kosong dibedakan dari error dan fixture diberi penanda yang jelas;
+- tidak ada tombol create, edit, atau delete pada halaman referensi.
 
 ### FR-07 Data mutation
 

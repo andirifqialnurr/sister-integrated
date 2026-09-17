@@ -20,7 +20,8 @@ bersifat portable. Bagian `Project Profile` berisi keputusan untuk repository
 - Theme configuration: `src/const/theme.ts`, dengan warna primary hijau dan
   chart ApexCharts.
 - Module convention: setiap fitur memiliki satu folder module, misalnya
-  `src/modules/pegawai/` dengan subfolder `page/`, `api/`, dan `widget/`.
+  `src/modules/pegawai/` atau `src/modules/referensi/` dengan subfolder
+  `page/`, `api/`, dan `widget/` sesuai kebutuhan.
 
 Pada project lain, ganti external system, framework, persistence, theme, dan
 nama module pada profile. Pertahankan boundary keamanan dan aturan adaptasi
@@ -198,6 +199,13 @@ Mapping untuk project `sister-integrated`:
       -> src/modules/pegawai/api/pegawai_adapter.ts
       -> src/modules/pegawai/repository/pegawai_cache_repository.ts (optional)
 
+    src/app/referensi/page.tsx
+      -> src/modules/referensi/page/referensi_page.tsx
+      -> src/modules/referensi/api/referensi_router.ts
+      -> src/modules/referensi/api/referensi_service.ts
+      -> src/modules/referensi/api/referensi_adapter.ts
+      -> src/modules/referensi/schema/referensi_schemas.ts
+
 Aturan folder:
 
 1. Folder `app/` hanya berisi route entry Next.js, loading/error boundary, dan
@@ -287,7 +295,8 @@ Capability tRPC yang disiapkan untuk MVP, bukan daftar final seluruh endpoint:
     pegawai.get_overview    query
     pegawai.get_profile     query
     pegawai.get_bkd         query
-    reference.get_options   query
+    referensi.get_profil_pt query
+    referensi.get_semester  query
     operation.get           query
     submission.get_status   query
     pegawai.update_data     mutation
@@ -377,6 +386,17 @@ belum dicache.
 
 Untuk project `sister-integrated`, `id_sdm` berasal dari `/referensi/sdm` dan
 `id_smt` berasal dari `/referensi/semester`.
+
+Read-only reference flow yang sudah diimplementasikan:
+
+    `/referensi/profil_pt` -> ReferensiDataSource.getProfilPt()
+    `/referensi/semester` -> ReferensiDataSource.getSemester()
+
+Kedua path tidak menerima query dari browser, diparse sebagai array sesuai
+kontrak PDF, lalu dipetakan menjadi DTO eksplisit. Fixture dan live adapter
+memiliki interface yang sama. Implementasi awal belum menulis reference cache
+karena kedua response belum dibutuhkan lintas request sebagai persistence; cache
+portable dapat ditambahkan setelah TTL dan minimisasi data ditetapkan.
 
 ## 8. Alur write dan update penuh
 

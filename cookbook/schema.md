@@ -22,6 +22,8 @@ evidence auditnya.
 - Local persistence hanya menyimpan user, konfigurasi, cache terbatas, audit,
   operation status, ajuan cache, dan metadata dokumen.
 - Data SISTER tidak dimirror sebagai database bisnis lokal.
+- Read-only reference module saat ini mencakup `/referensi/profil_pt` dan
+  `/referensi/semester`; keduanya belum dipersist ke database lokal.
 
 ## Cara mengadaptasi dokumen
 
@@ -90,7 +92,7 @@ Tipe identifier yang perlu dibedakan:
 | id resource | ID pendidikan, penelitian, dokumen, dan seterusnya | Umumnya UUID |
 | id referensi integer | jenis dokumen, bidang studi, jenis kegiatan | Integer |
 | id referensi string | negara, ikatan kerja, skim kegiatan | String |
-| id semester | BKD dan kegiatan per semester | String |
+| id semester | nilai `id` dari `/referensi/semester` | Integer pada endpoint referensi; tipe `id_smt` di endpoint lain tetap mengikuti kontraknya |
 | id kelas kuliah | dokumen kelas kuliah | UUID |
 
 ### 2.2 Autentikasi
@@ -175,6 +177,49 @@ Parameter pencarian yang didokumentasikan:
 Jika id_sp digunakan, PDF mensyaratkan nama minimal tiga karakter. Validasi
 tersebut harus diberlakukan pada UI dan backend aplikasi.
 
+### 3.1.1 Profil perguruan tinggi
+
+GET `/referensi/profil_pt` pada halaman PDF 249 tidak memiliki parameter
+request. Response didokumentasikan sebagai array object dengan field berikut:
+
+| Field | Tipe | Keterangan |
+| --- | --- | --- |
+| id | string | ID perguruan tinggi |
+| kode_perguruan_tinggi | string | Kode perguruan tinggi |
+| nama_perguruan_tinggi | string | Nama perguruan tinggi |
+| telepon | string | Nomor telepon |
+| faximile | string | Nomor faximile |
+| email | string | Email perguruan tinggi |
+| website | string | Website perguruan tinggi |
+| jalan | string | Jalan |
+| dusun | string | Dusun |
+| rt | integer | Rukun tetangga |
+| rw | integer | Rukun warga |
+| kelurahan | string | Kelurahan |
+| kode_pos | string | Kode pos |
+| id_wilayah | string | ID wilayah |
+
+Adapter aplikasi memanggil path tetap tersebut tanpa menerima path atau query
+dari browser. DTO tRPC memilih ulang hanya 14 field yang terdokumentasi.
+Informasi kontak dan alamat tidak ditulis ke cache lokal pada implementasi
+awal; bila nanti perlu disimpan, klasifikasi PII, permission, dan retention
+harus ditinjau ulang melalui `security.md`.
+
+### 3.1.2 Semester
+
+GET `/referensi/semester` pada halaman PDF 257-258 tidak memiliki parameter
+request. Response didokumentasikan sebagai array object:
+
+| Field | Tipe | Keterangan |
+| --- | --- | --- |
+| id | integer | ID objek semester |
+| nama | string | Nama objek semester |
+
+`id` semester dipakai sebagai referensi untuk endpoint BKD dan domain lain yang
+memang mencantumkannya pada kontrak. Aplikasi tidak membuat semester lokal,
+tidak mengarang status semester, dan tidak menambahkan pagination karena PDF
+tidak mendokumentasikan parameter tersebut pada endpoint ini.
+
 ### 3.2 Metadata dokumen
 
 Model dokumen yang muncul berulang pada detail data:
@@ -247,7 +292,7 @@ berulang memiliki field:
 | --- | --- |
 | nm_sdm | string |
 | nidn | string |
-| id_smt | string |
+| id_smt | string atau integer sesuai endpoint |
 | unsur | string |
 | judul_keg | string |
 | id_katgiat | integer |
@@ -505,6 +550,12 @@ disimpan di memory process atau secret/cache terenkripsi dengan TTL.
 
 Cache referensi dapat dihapus dan dibangun ulang. Cache tidak boleh dianggap
 sebagai data yang lebih baru daripada SISTER.
+
+Implementasi awal repository membaca profil PT dan semester melalui adapter
+fixture atau SISTER secara langsung tanpa menulis `sister_reference_cache`.
+Tabel cache tetap menjadi opsi portable untuk kebutuhan performa setelah TTL,
+invalidasi, dan minimisasi data disetujui; keberadaan model cache tidak berarti
+semua endpoint referensi harus langsung dicache.
 
 ### 7.4 sister_sdm_index_cache
 
