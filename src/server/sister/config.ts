@@ -22,6 +22,11 @@ export type SisterConfig = {
   sdm_cache_ttl_ms: number;
 };
 
+export type SisterConfigurationStatus = {
+  mode: "fixture" | "live";
+  configuration: "ready" | "incomplete";
+};
+
 const defaultSdmCacheTtlMs = 5 * 60 * 1000;
 
 function getSdmCacheTtlMs() {
@@ -87,4 +92,21 @@ export function getSisterConfig(): SisterConfig {
     credential_ref: environment.SISTER_CREDENTIAL_REF ?? null,
     sdm_cache_ttl_ms: getSdmCacheTtlMs(),
   };
+}
+
+export function getSisterConfigurationStatus(): SisterConfigurationStatus {
+  const fixtureMode =
+    process.env.NODE_ENV !== "production" &&
+    process.env.SISTER_FIXTURE_MODE !== "false";
+
+  if (fixtureMode) {
+    return { mode: "fixture", configuration: "ready" };
+  }
+
+  try {
+    getSisterConfig();
+    return { mode: "live", configuration: "ready" };
+  } catch {
+    return { mode: "live", configuration: "incomplete" };
+  }
 }

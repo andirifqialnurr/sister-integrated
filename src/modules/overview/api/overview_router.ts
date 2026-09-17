@@ -1,4 +1,7 @@
-import { createTRPCRouter, publicProcedure } from "@/server/trpc/init";
+import { getSisterConfigurationStatus } from "@/server/sister/config";
+import { createTRPCRouter, protectedProcedure, publicProcedure } from "@/server/trpc/init";
+
+import { overviewStatusSchema } from "../schema/overview_schema";
 
 export const overviewRouter = createTRPCRouter({
   health: publicProcedure.query(({ ctx }) => ({
@@ -7,4 +10,23 @@ export const overviewRouter = createTRPCRouter({
     request_id: ctx.requestId,
     sister_connected: false,
   })),
+  status: protectedProcedure.query(({ ctx }) => {
+    const sisterStatus = getSisterConfigurationStatus();
+
+    return overviewStatusSchema.parse({
+      request_id: ctx.requestId,
+      checked_at: new Date().toISOString(),
+      environment: process.env.NODE_ENV === "production" ? "production" : "development",
+      auth_mode:
+        process.env.NODE_ENV === "production"
+          ? "provider_required"
+          : "development_fixture",
+      session_state: ctx.user ? "present" : "missing",
+      database_state: process.env.DATABASE_URL?.trim()
+        ? "configured"
+        : "not_configured",
+      sister_mode: sisterStatus.mode,
+      sister_configuration: sisterStatus.configuration,
+    });
+  }),
 });

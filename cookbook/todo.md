@@ -122,6 +122,18 @@ lokal dan tidak mengubah database SISTER.
 - [ ] Audit readback belum diverifikasi dengan PostgreSQL migration dan user
       ADMIN nyata pada UAT.
 
+## Operational diagnostics checkpoint: 2026-09-17
+
+- [x] Procedure protected `overview.status` mengembalikan status aman untuk
+      auth seam, database configuration, dan SISTER fixture/live configuration.
+- [x] Status live yang belum lengkap tidak melempar detail credential atau URL
+      ke browser.
+- [x] Dashboard memakai widget status dengan state loading, error, fixture,
+      incomplete, ready, dan refresh manual.
+- [x] Unit test configuration status dan procedure overview lulus.
+- [ ] Health check live `/authorize` belum dijalankan otomatis; perlu aksi
+      eksplisit setelah credential UAT dan kebijakan maintenance dikonfirmasi.
+
 ## 0. Gate kontrak eksternal
 
 - [ ] Identifikasi perguruan tinggi target dan instance SISTER yang akan dipakai.

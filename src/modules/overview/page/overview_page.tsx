@@ -9,8 +9,9 @@ import {
 import { Sidebar } from "@/component/ui/sidebar";
 import { StatusBadge } from "@/component/ui/status_badge";
 import { EmptyActivity } from "@/component/widget/empty_activity";
-import { IntegrationStatusCard } from "@/component/widget/integration_status_card";
 import { StatCard } from "@/component/widget/stat_card";
+
+import { OverviewStatusWidget } from "../widget/overview_status_widget";
 
 export function OverviewPage() {
   return (
@@ -103,7 +104,7 @@ export function OverviewPage() {
               </div>
             </article>
 
-            <IntegrationStatusCard />
+            <OverviewStatusWidget />
           </section>
 
           <section className="rounded-xl border border-[hsl(var(--color-primary))]/20 bg-[hsl(var(--color-primary-soft))] p-5">
