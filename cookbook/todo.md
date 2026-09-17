@@ -51,6 +51,8 @@ Milestone pertama sudah mulai dikerjakan sebagai read-only vertical slice:
       `/pegawai/{id_sdm}`.
 - [x] Procedure `pegawai.search` dan `pegawai.get_detail` melewati protected
       tRPC boundary dan Zod input validation.
+- [x] Detail pegawai membaca `GET /data_pribadi/profil/{id_sdm}` dan
+      `GET /data_pribadi/kepegawaian/{id_sdm}` melalui adapter server-only.
 - [x] Fixture sintetis tersedia untuk development; fixture ditolak di
       production.
 - [x] Adapter live sudah dibatasi ke endpoint SDM yang disetujui PDF.
@@ -357,15 +359,15 @@ library atau tabel sudah dibuat.
 
 Scope awal yang disarankan:
 
-- [ ] GET /referensi/profil_pt untuk identitas PT.
-- [ ] GET /referensi/sdm untuk pencarian SDM.
-- [ ] GET /referensi/semester untuk filter semester.
-- [ ] GET /data_pribadi/profil/{id_sdm}.
-- [ ] GET /data_pribadi/kepegawaian/{id_sdm}.
-- [ ] GET /penugasan dengan detail bila dibutuhkan.
-- [ ] GET /pendidikan_formal dan detailnya.
-- [ ] GET /bkd/laporan_akhir_bkd.
-- [ ] GET /bkd/pendidikan, /ajar, /tunjang, /pengmas, dan /penelitian.
+- [x] GET /referensi/profil_pt untuk identitas PT.
+- [x] GET /referensi/sdm untuk pencarian SDM.
+- [x] GET /referensi/semester untuk filter semester.
+- [x] GET /data_pribadi/profil/{id_sdm}.
+- [x] GET /data_pribadi/kepegawaian/{id_sdm}.
+- [x] GET /penugasan dengan detail bila dibutuhkan.
+- [x] GET /pendidikan_formal dan detailnya.
+- [x] GET /bkd/laporan_akhir_bkd.
+- [x] GET /bkd/pendidikan, /ajar, /tunjang, /pengmas, dan /penelitian.
 - [ ] GET satu atau lebih referensi bertingkat yang dibutuhkan halaman.
 - [ ] Bedakan loading, empty, error, unauthorized, dan stale cache.
 - [ ] Pastikan resource read-only tidak menampilkan tombol mutation.
