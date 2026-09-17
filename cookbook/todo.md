@@ -99,6 +99,14 @@ lokal dan tidak mengubah database SISTER.
       lokal/UAT belum tersedia.
 - [ ] DB runtime role, backup, restore, retention, dan audit append-only belum
       diverifikasi pada environment deployment.
+- [x] Repository Prisma `sister_sdm_index_cache` tersedia dengan composite key
+      `integration_id` + `id_sdm` dan mapping kembali ke DTO SISTER.
+- [x] Pegawai live read memiliki write-through summary cache dan detail dapat
+      membaca cache yang masih fresh sebelum fallback ke SISTER.
+- [x] Cache tidak aktif pada fixture mode atau tanpa `DATABASE_URL` dan
+      kegagalannya tidak menjatuhkan read utama.
+- [ ] Cache read/write belum diuji terhadap PostgreSQL nyata dan belum memiliki
+      job retention/cleanup.
 
 ## 0. Gate kontrak eksternal
 

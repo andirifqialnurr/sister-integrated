@@ -3,6 +3,10 @@ import { SisterNotFoundError } from "@/server/sister/errors";
 import type { SdmSummary } from "@/server/sister/types";
 
 import {
+  PrismaPegawaiCacheRepository,
+  type PegawaiCacheRepository,
+} from "../repository/pegawai_cache_repository";
+import {
   FixturePegawaiAdapter,
   SisterPegawaiAdapter,
   type PegawaiDataSource,
@@ -21,6 +25,31 @@ function createPegawaiDataSource(): PegawaiDataSource {
     : new SisterPegawaiAdapter();
 }
 
+function createPegawaiCacheRepository(): PegawaiCacheRepository | null {
+  const config = getSisterConfig();
+  if (config.fixture_mode || !config.integration_id || !process.env.DATABASE_URL?.trim()) {
+    return null;
+  }
+
+  return new PrismaPegawaiCacheRepository();
+}
+
+async function writeSummaryCache(
+  cacheRepository: PegawaiCacheRepository | null,
+  integrationId: string | null,
+  items: SdmSummary[],
+) {
+  if (!cacheRepository || !integrationId || items.length === 0) {
+    return;
+  }
+
+  try {
+    await cacheRepository.upsertMany(integrationId, items);
+  } catch {
+    // Cache failure must not turn a successful read from SISTER into an error.
+  }
+}
+
 function toSafeSummary(summary: SdmSummary) {
   return {
     id_sdm: summary.id_sdm,
@@ -37,8 +66,11 @@ function toSafeSummary(summary: SdmSummary) {
 export async function searchPegawai(
   input: PegawaiSearchInput,
   dataSource: PegawaiDataSource = createPegawaiDataSource(),
+  cacheRepository: PegawaiCacheRepository | null = createPegawaiCacheRepository(),
 ): Promise<PegawaiSearchResponse> {
+  const config = getSisterConfig();
   const allResults = await dataSource.search({ ...input, page: 1, per_page: 50 });
+  await writeSummaryCache(cacheRepository, config.integration_id, allResults);
   const offset = (input.page - 1) * input.per_page;
   const pageItems = allResults.slice(offset, offset + input.per_page).map(toSafeSummary);
 
@@ -47,7 +79,7 @@ export async function searchPegawai(
     total: allResults.length,
     page: input.page,
     per_page: input.per_page,
-    source: getSisterConfig().fixture_mode ? "fixture" : "sister",
+    source: config.fixture_mode ? "fixture" : "sister",
     fetched_at: new Date().toISOString(),
   });
 }
@@ -55,14 +87,34 @@ export async function searchPegawai(
 export async function getPegawaiDetail(
   idSdm: string,
   dataSource: PegawaiDataSource = createPegawaiDataSource(),
+  cacheRepository: PegawaiCacheRepository | null = createPegawaiCacheRepository(),
 ): Promise<PegawaiDetailResponse> {
-  const summaryList = await dataSource.search({
-    search_by: "nama",
-    search: "",
-    page: 1,
-    per_page: 50,
-  });
-  const summary = summaryList.find((item) => item.id_sdm === idSdm);
+  const config = getSisterConfig();
+  let summary: SdmSummary | undefined;
+
+  if (cacheRepository && config.integration_id) {
+    try {
+      summary =
+        (await cacheRepository.findFreshById(
+          config.integration_id,
+          idSdm,
+          config.sdm_cache_ttl_ms,
+        )) ?? undefined;
+    } catch {
+      summary = undefined;
+    }
+  }
+
+  if (!summary) {
+    const summaryList = await dataSource.search({
+      search_by: "nama",
+      search: "",
+      page: 1,
+      per_page: 50,
+    });
+    await writeSummaryCache(cacheRepository, config.integration_id, summaryList);
+    summary = summaryList.find((item) => item.id_sdm === idSdm);
+  }
 
   if (!summary) {
     throw new SisterNotFoundError();
@@ -77,7 +129,7 @@ export async function getPegawaiDetail(
     summary: toSafeSummary(summary),
     profile,
     employment,
-    source: getSisterConfig().fixture_mode ? "fixture" : "sister",
+    source: config.fixture_mode ? "fixture" : "sister",
     fetched_at: new Date().toISOString(),
   });
 }

@@ -5,6 +5,7 @@ const optionalText = z.string().trim().min(1).optional();
 const sisterEnvironmentSchema = z.object({
   SISTER_BASE_URL: optionalText,
   SISTER_ID_PENGGUNA: optionalText,
+  SISTER_INTEGRATION_ID: optionalText,
   SISTER_USERNAME: optionalText,
   SISTER_PASSWORD: optionalText,
   SISTER_CREDENTIAL_REF: optionalText,
@@ -14,10 +15,23 @@ export type SisterConfig = {
   fixture_mode: boolean;
   base_url: string | null;
   id_pengguna: string | null;
+  integration_id: string | null;
   username: string | null;
   password: string | null;
   credential_ref: string | null;
+  sdm_cache_ttl_ms: number;
 };
+
+const defaultSdmCacheTtlMs = 5 * 60 * 1000;
+
+function getSdmCacheTtlMs() {
+  const seconds = Number(process.env.SISTER_SDM_CACHE_TTL_SECONDS);
+  if (Number.isSafeInteger(seconds) && seconds >= 30 && seconds <= 24 * 60 * 60) {
+    return seconds * 1000;
+  }
+
+  return defaultSdmCacheTtlMs;
+}
 
 export function getSisterConfig(): SisterConfig {
   const environment = sisterEnvironmentSchema.parse(process.env);
@@ -30,9 +44,11 @@ export function getSisterConfig(): SisterConfig {
       fixture_mode: true,
       base_url: environment.SISTER_BASE_URL ?? null,
       id_pengguna: environment.SISTER_ID_PENGGUNA ?? null,
+      integration_id: environment.SISTER_INTEGRATION_ID ?? null,
       username: null,
       password: null,
       credential_ref: environment.SISTER_CREDENTIAL_REF ?? null,
+      sdm_cache_ttl_ms: getSdmCacheTtlMs(),
     };
   }
 
@@ -54,12 +70,21 @@ export function getSisterConfig(): SisterConfig {
     throw new Error("SISTER credentials are not configured");
   }
 
+  if (
+    environment.SISTER_INTEGRATION_ID &&
+    !z.string().uuid().safeParse(environment.SISTER_INTEGRATION_ID).success
+  ) {
+    throw new Error("SISTER integration ID must be a valid UUID");
+  }
+
   return {
     fixture_mode: false,
     base_url: parsedBaseUrl.toString(),
     id_pengguna: environment.SISTER_ID_PENGGUNA,
+    integration_id: environment.SISTER_INTEGRATION_ID ?? null,
     username: environment.SISTER_USERNAME,
     password: environment.SISTER_PASSWORD,
     credential_ref: environment.SISTER_CREDENTIAL_REF ?? null,
+    sdm_cache_ttl_ms: getSdmCacheTtlMs(),
   };
 }

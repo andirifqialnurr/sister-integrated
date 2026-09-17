@@ -526,6 +526,12 @@ Cache minimal dari GET /referensi/sdm untuk pencarian dan navigasi.
 NIK, NPWP, alamat, kontak, dan data keluarga tidak disimpan pada cache indeks
 ini.
 
+Implementasi repository dapat melakukan upsert ringkasan setelah query live dan
+lookup summary berdasarkan composite key `integration_id` + `id_sdm` hanya bila
+`fetched_at` masih berada dalam TTL konfigurasi. Cache gagal atau stale harus
+menjadi alasan fallback ke SISTER, bukan alasan mengembalikan data tanpa status.
+Profil dan kepegawaian detail tidak termasuk cache indeks ini.
+
 ### 7.5 sister_operation
 
 Satu baris untuk setiap request penting ke SISTER, terutama operasi perubahan.

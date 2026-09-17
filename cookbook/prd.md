@@ -271,6 +271,12 @@ Acceptance:
 - hasil kosong berbeda dari error;
 - pemilihan SDM menjadi context untuk halaman detail.
 
+Implementasi lokal boleh menulis ringkasan hasil ke `sister_sdm_index_cache`
+untuk mempercepat lookup detail. Cache harus terikat pada `integration_id`,
+memiliki TTL, hanya memuat field ringkasan yang diizinkan, dan tidak boleh
+ditampilkan sebagai live bila stale. Detail profil dan kepegawaian tetap
+memerlukan pembacaan capability SISTER yang sesuai.
+
 ### FR-04 SDM overview
 
 Sistem menampilkan overview dan link/tab ke endpoint data pokok, pendidikan,

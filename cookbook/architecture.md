@@ -195,7 +195,8 @@ Mapping untuk project `sister-integrated`:
       -> src/modules/pegawai/page/pegawai_page.tsx
       -> src/modules/pegawai/api/pegawai_router.ts
       -> src/modules/pegawai/api/pegawai_service.ts
-      -> src/modules/pegawai/api/pegawai_sister_adapter.ts
+      -> src/modules/pegawai/api/pegawai_adapter.ts
+      -> src/modules/pegawai/repository/pegawai_cache_repository.ts (optional)
 
 Aturan folder:
 
@@ -365,6 +366,14 @@ Aturan read:
 - response array kosong adalah empty state, bukan error;
 - cache diberi timestamp dan status stale;
 - data sensitif detail tidak dicache kecuali ada alasan produk yang disetujui.
+
+Pada `sister-integrated`, `sister_sdm_index_cache` hanya menyimpan field ringkas
+yang berasal dari response `/referensi/sdm`. Cache live bersifat write-through
+setelah pembacaan SISTER dan dapat dipakai untuk lookup summary berdasarkan
+`integration_id` + `id_sdm` selama umur cache masih valid. Jika cache kosong,
+stale, atau gagal ditulis, service kembali ke adapter SISTER; cache tidak boleh
+menyamarkan data stale sebagai response live. Profil dan kepegawaian detail
+belum dicache.
 
 Untuk project `sister-integrated`, `id_sdm` berasal dari `/referensi/sdm` dan
 `id_smt` berasal dari `/referensi/semester`.
