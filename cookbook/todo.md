@@ -31,7 +31,8 @@ turunan dari [schema.md](./schema.md), [architecture.md](./architecture.md),
 - Shared primitive: `src/component/ui/`.
 - Shared composite: `src/component/widget/`.
 - Theme: `src/const/theme.ts`, primary hijau, chart ApexCharts.
-- Module awal read-only: `src/modules/pegawai/` dan `src/modules/referensi/`.
+- Module awal read-only: `src/modules/pegawai/`, `src/modules/referensi/`, dan
+  `src/modules/bkd/`.
 - Security contract: `security.md`, dengan `security_audit_event` terpisah dari
   `sister_operation`.
 
@@ -151,6 +152,25 @@ terbaca jelas dari PDF. Tidak ada endpoint referensi lain yang ikut dibuka.
 - [x] Test adapter, schema, service, dan router lulus.
 - [ ] Response live instance SISTER belum diuji karena credential dan UAT
       belum tersedia.
+
+## BKD read-only checkpoint: 2026-09-17
+
+Checkpoint ini hanya mencakup enam endpoint GET pada PDF halaman 19-26.
+Tidak ada endpoint write, pagination, atau field tambahan yang dibuka.
+
+- [x] Schema runtime laporan akhir mengikuti `/bkd/laporan_akhir_bkd` dengan
+      query `id_sdm` dan 19 field response terdokumentasi.
+- [x] Schema runtime lima aktivitas mengikuti `/bkd/pendidikan`, `/bkd/ajar`,
+      `/bkd/tunjang`, `/bkd/pengmas`, dan `/bkd/penelitian` dengan query
+      `id_sdm` + `id_smt` serta 9 field response terdokumentasi.
+- [x] Adapter live memakai enam path tetap dan query yang didokumentasikan;
+      tidak ada generic proxy.
+- [x] Fixture, service safe DTO, protected tRPC procedures, dan route `/bkd`
+      tersedia dalam folder module `bkd`.
+- [x] UI memilih SDM/semester dari referensi, membedakan loading, empty, error,
+      source, dan memuat tab aktivitas secara lazy.
+- [x] Test schema, adapter, service, dan router lulus.
+- [ ] Response live BKD belum diuji karena credential dan UAT belum tersedia.
 
 ## 0. Gate kontrak eksternal
 

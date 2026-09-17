@@ -20,9 +20,9 @@ merupakan bagian dari product scope.
 - Sumber batas capability: [SISTER Web Service PT.pdf](../SISTER%20Web%20Service%20PT.pdf).
 - Scope reference: 236 endpoint unik dalam 39 domain; tidak seluruhnya masuk
   release pertama.
-- Module awal read-only: `pegawai` dan `referensi`, dengan page, API procedure,
-  service, schema, widget, dan repository khusus (bila dibutuhkan) berada di
-  folder module masing-masing.
+- Module awal read-only: `pegawai`, `referensi`, dan `bkd`, dengan page, API
+  procedure, service, schema, widget, dan repository khusus (bila dibutuhkan)
+  berada di folder module masing-masing.
 - Internal API: tRPC typed API; upload multipart dan download binary memakai
   Route Handler khusus.
 - Local persistence: PostgreSQL + Prisma untuk metadata aplikasi; table dan
@@ -190,6 +190,10 @@ Keduanya tetap memakai fixture di development sampai credential dan instance
 UAT dikonfirmasi; implementasi lokal tidak boleh dianggap sebagai bukti bahwa
 response instance produksi sudah tervalidasi.
 
+Modul BKD read-only juga mencakup laporan akhir dan lima list aktivitas sesuai
+halaman PDF 19-26. UI memuat satu tab aktivitas aktif pada satu waktu dan tidak
+menyediakan mutation.
+
 ### 7.2 Release pertama: UI
 
 - login aplikasi atau auth boundary sesuai keputusan;
@@ -313,6 +317,16 @@ Acceptance:
 - request selalu menggunakan id_sdm yang dipilih;
 - angka SKS dan nilai memakai format numerik yang aman;
 - tidak ada aksi edit pada endpoint BKD yang terdokumentasi GET-only.
+
+Implementasi awal menambahkan procedure `bkd.laporan_akhir`,
+`bkd.pendidikan`, `bkd.ajar`, `bkd.tunjang`, `bkd.pengmas`, dan
+`bkd.penelitian`. Acceptance tambahan:
+
+- selector SDM mengambil option dari `/referensi/sdm`, bukan input UUID bebas;
+- selector semester mengambil `id` dan `nama` dari `/referensi/semester`;
+- laporan akhir dan aktivitas memiliki state loading, empty, error, dan source;
+- field tabel mengikuti response PDF tanpa pagination yang tidak terdokumentasi;
+- pergantian tab hanya memuat endpoint aktivitas yang dipilih.
 
 ### FR-06 Reference options
 

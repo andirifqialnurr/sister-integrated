@@ -20,8 +20,8 @@ bersifat portable. Bagian `Project Profile` berisi keputusan untuk repository
 - Theme configuration: `src/const/theme.ts`, dengan warna primary hijau dan
   chart ApexCharts.
 - Module convention: setiap fitur memiliki satu folder module, misalnya
-  `src/modules/pegawai/` atau `src/modules/referensi/` dengan subfolder
-  `page/`, `api/`, dan `widget/` sesuai kebutuhan.
+  `src/modules/pegawai/`, `src/modules/referensi/`, atau `src/modules/bkd/`
+  dengan subfolder `page/`, `api/`, dan `widget/` sesuai kebutuhan.
 
 Pada project lain, ganti external system, framework, persistence, theme, dan
 nama module pada profile. Pertahankan boundary keamanan dan aturan adaptasi
@@ -206,6 +206,13 @@ Mapping untuk project `sister-integrated`:
       -> src/modules/referensi/api/referensi_adapter.ts
       -> src/modules/referensi/schema/referensi_schemas.ts
 
+    src/app/bkd/page.tsx
+      -> src/modules/bkd/page/bkd_page.tsx
+      -> src/modules/bkd/api/bkd_router.ts
+      -> src/modules/bkd/api/bkd_service.ts
+      -> src/modules/bkd/api/bkd_adapter.ts
+      -> src/modules/bkd/widget/bkd_workspace_widget.tsx
+
 Aturan folder:
 
 1. Folder `app/` hanya berisi route entry Next.js, loading/error boundary, dan
@@ -297,6 +304,12 @@ Capability tRPC yang disiapkan untuk MVP, bukan daftar final seluruh endpoint:
     pegawai.get_bkd         query
     referensi.get_profil_pt query
     referensi.get_semester  query
+    bkd.laporan_akhir       query
+    bkd.pendidikan          query
+    bkd.ajar                query
+    bkd.tunjang             query
+    bkd.pengmas             query
+    bkd.penelitian          query
     operation.get           query
     submission.get_status   query
     pegawai.update_data     mutation
@@ -397,6 +410,13 @@ kontrak PDF, lalu dipetakan menjadi DTO eksplisit. Fixture dan live adapter
 memiliki interface yang sama. Implementasi awal belum menulis reference cache
 karena kedua response belum dibutuhkan lintas request sebagai persistence; cache
 portable dapat ditambahkan setelah TTL dan minimisasi data ditetapkan.
+
+Modul BKD mengikuti alur referensi tersebut. UI tidak menerima UUID atau
+semester arbitrary dari user; user memilih SDM dan semester dari hasil query
+referensi. Laporan akhir dipanggil dengan `id_sdm`, sedangkan lima tab aktivitas
+dipanggil dengan `id_sdm` dan `id_smt`. Tab aktivitas dimuat satu per satu agar
+halaman tidak mengirim lima request aktivitas sekaligus. Semua procedure BKD
+adalah protected query dan tidak menyediakan mutation.
 
 ## 8. Alur write dan update penuh
 

@@ -304,6 +304,65 @@ GET /bkd/laporan_akhir_bkd mengembalikan ringkasan yang berbeda, antara lain
 id_reg_ptk, id_smt, SKS kinerja/lebih untuk beberapa unsur, status kewajiban,
 status tugas, status belajar, id jabatan fungsional, dan simpulan asesor.
 
+### 3.4.1 Kontrak endpoint BKD yang dipilih
+
+Kontrak berikut berasal dari halaman PDF 19-26 dan menjadi batas implementasi
+modul `bkd` read-only.
+
+`GET /bkd/laporan_akhir_bkd` menerima query wajib `id_sdm` bertipe UUID dan
+mengembalikan array object dengan field:
+
+| Field | Tipe PDF |
+| --- | --- |
+| id_reg_ptk | uuid |
+| id_smt | bpchar/string |
+| sks_kinerja_ajar | numeric |
+| sks_lebih_ajar | numeric |
+| sks_kinerja_didik | numeric |
+| sks_lebih_didik | numeric |
+| sks_kinerja_lit | numeric |
+| sks_lebih_lit | numeric |
+| sks_kinerja_pengmas | numeric |
+| sks_lebih_pengmas | numeric |
+| sks_kinerja_penunjang | numeric |
+| sks_lebih_tunjang | numeric |
+| sks_kinerja | numeric |
+| sks_lebih | numeric |
+| stat_kewajiban | numeric |
+| stat_tugas | bpchar/string |
+| stat_belajar | bpchar/string |
+| id_jabfung | numeric |
+| simpulan_asesor | bpchar/string |
+
+Lima endpoint aktivitas berikut menerima query wajib `id_sdm` bertipe UUID dan
+`id_smt` bertipe string:
+
+- GET `/bkd/pendidikan`;
+- GET `/bkd/ajar`;
+- GET `/bkd/tunjang`;
+- GET `/bkd/pengmas`;
+- GET `/bkd/penelitian`.
+
+Masing-masing mengembalikan array object dengan field yang sama:
+
+| Field | Tipe PDF |
+| --- | --- |
+| nm_sdm | string |
+| nidn | string |
+| id_smt | string |
+| unsur | string |
+| judul_keg | string |
+| id_katgiat | integer |
+| nm_kat | string |
+| beban_sks | number |
+| nilai | number |
+
+Tidak ada parameter pagination pada keenam endpoint ini. `id_sdm` harus berasal
+dari hasil `/referensi/sdm`, sedangkan pilihan semester berasal dari
+`/referensi/semester` dan dikirim sebagai string query sesuai contoh PDF.
+Response kosong adalah empty state, bukan error. Implementasi awal tidak
+menyimpan baris BKD ke Prisma atau cache lokal.
+
 ## 4. Inventaris domain SISTER
 
 Indeks PDF mencantumkan 236 endpoint unik. Heading endpoint muncul pada bagian
