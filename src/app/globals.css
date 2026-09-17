@@ -1,0 +1,53 @@
+@import "tailwindcss";
+
+:root {
+  --color-primary: 142 76% 30%;
+  --color-primary-strong: 142 72% 23%;
+  --color-primary-soft: 142 52% 94%;
+  --color-canvas: 144 25% 97%;
+  --color-surface: 0 0% 100%;
+  --color-border: 145 18% 86%;
+  --color-text: 150 18% 15%;
+  --color-muted: 150 8% 43%;
+  --color-success: 142 71% 35%;
+  --color-success-strong: 142 71% 28%;
+  --color-success-soft: 142 50% 92%;
+  --color-warning: 38 92% 42%;
+  --color-warning-strong: 32 88% 32%;
+  --color-warning-soft: 42 92% 92%;
+  --color-danger: 0 72% 51%;
+  --color-danger-strong: 0 65% 40%;
+  --color-danger-soft: 0 82% 95%;
+  --color-neutral-soft: 150 12% 93%;
+}
+
+@theme inline {
+  --color-primary: hsl(var(--color-primary));
+  --color-primary-strong: hsl(var(--color-primary-strong));
+  --color-primary-soft: hsl(var(--color-primary-soft));
+  --color-canvas: hsl(var(--color-canvas));
+  --color-surface: hsl(var(--color-surface));
+  --color-border: hsl(var(--color-border));
+  --color-text: hsl(var(--color-text));
+  --color-muted: hsl(var(--color-muted));
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  background: hsl(var(--color-canvas));
+}
+
+body {
+  min-height: 100vh;
+  background: hsl(var(--color-canvas));
+  color: hsl(var(--color-text));
+  font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+}
+
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+}

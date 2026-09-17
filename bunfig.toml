@@ -1,0 +1,4 @@
+[run]
+# Force package executables with a Node shebang to run on Bun.
+bun = true
+shell = "bun"

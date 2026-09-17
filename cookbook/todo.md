@@ -1,0 +1,382 @@
+# Portable TODO dan Project Backlog
+
+Status: portable base + project profile
+
+Backlog ini memiliki dua lapisan: checklist portable yang dapat dipakai ulang
+dan backlog detail untuk repository `sister-integrated`. Backlog detail adalah
+turunan dari [schema.md](./schema.md), [architecture.md](./architecture.md),
+[prd.md](./prd.md), [security.md](./security.md), dan
+[SISTER Web Service PT.pdf](../SISTER%20Web%20Service%20PT.pdf).
+
+## Cara menggunakan pada repository lain
+
+1. Baca repository tujuan, package manager/runner, framework, database, auth, dan
+   testing setup sebelum mencentang atau menambah item.
+2. Pertahankan gate kontrak, module-first, shared component/widget, server-only
+   secret boundary, dan database `snake_case`.
+3. Ganti project profile dan semua item yang menyebut external system, endpoint,
+   role, status, atau domain khusus.
+4. Jangan menganggap item selesai hanya karena struktur file sudah dibuat;
+   setiap item membutuhkan evidence yang sesuai dengan levelnya.
+
+## Project Profile: `sister-integrated`
+
+- External system: SISTER Web Service PT API Reference versi 1.0.0.
+- Target inventory: 236 endpoint unik dalam 39 domain.
+- Web: Next.js App Router, React, TypeScript, dan tRPC.
+- Runner/runtime: Bun 1.3.x; workflow install dan script menggunakan
+  `bun install` serta `bun run <script>`. `bun.lock` menjadi lockfile dan
+  `bunfig.toml` memaksa executable script berjalan dengan Bun.
+- Local data: PostgreSQL + Prisma; table/column physical name `snake_case`.
+- Shared primitive: `src/component/ui/`.
+- Shared composite: `src/component/widget/`.
+- Theme: `src/const/theme.ts`, primary hijau, chart ApexCharts.
+- Module awal: `src/modules/pegawai/`.
+- Security contract: `security.md`, dengan `security_audit_event` terpisah dari
+  `sister_operation`.
+
+Checkbox tidak boleh dicentang hanya karena kode terlihat selesai. Setiap item
+harus memiliki bukti yang sesuai: source check, unit test, contract test,
+UAT, atau browser QA.
+
+## Implementation checkpoint: 2026-09-17
+
+Milestone pertama sudah mulai dikerjakan sebagai read-only vertical slice:
+
+- [x] Foundation Next.js, tRPC, Prisma schema, Bun runner, dan theme hijau
+      tersedia di repository.
+- [x] Modul `pegawai` memiliki route `/pegawai` dan detail
+      `/pegawai/{id_sdm}`.
+- [x] Procedure `pegawai.search` dan `pegawai.get_detail` melewati protected
+      tRPC boundary dan Zod input validation.
+- [x] Fixture sintetis tersedia untuk development; fixture ditolak di
+      production.
+- [x] Adapter live sudah dibatasi ke endpoint SDM yang disetujui PDF.
+- [x] Test unit schema, adapter, service, dan production fixture guard lulus.
+- [ ] Auth/session provider production, PostgreSQL migration, credential UAT,
+      dan live contract test belum tersedia.
+
+## 0. Gate kontrak eksternal
+
+- [ ] Identifikasi perguruan tinggi target dan instance SISTER yang akan dipakai.
+- [ ] Dapatkan base URL API resmi untuk instance tersebut.
+- [ ] Dapatkan YAML API resmi, bukan hanya PDF hasil generate.
+- [ ] Konfirmasi API version yang aktif pada instance.
+- [ ] Dapatkan credential UAT yang aman untuk role WS-BASIC atau WS-PRO.
+- [ ] Konfirmasi arti dan kepemilikan id_pengguna.
+- [ ] Panggil POST /authorize pada environment UAT dan catat role hasilnya
+      tanpa menyimpan credential di repository.
+- [ ] Konfirmasi apakah aplikasi memerlukan login lokal, SSO SISTER, atau
+      keduanya.
+- [ ] Konfirmasi ukuran file, MIME type, dan aturan upload tiap jenis dokumen.
+- [ ] Konfirmasi timeout, rate limit, dan kebijakan maintenance instance.
+- [ ] Konfirmasi metadata pagination pada lima endpoint yang mencantumkan
+      per_page dan page.
+- [ ] Validasi endpoint /data_pribadi/ajuan yang dirujuk PDF tetapi tidak
+      muncul pada indeks.
+- [ ] Validasi nested bidang_ilmu PUT pada domain yang dinyatakan read-only.
+- [ ] Catat perbedaan response aktual dengan PDF sebagai contract issue.
+
+## 0.1 Security gate sebelum coding
+
+Detail control dan evidence ada di [security.md](./security.md). Semua item
+berikut harus memiliki owner dan evidence; jangan mencentang hanya karena
+library atau tabel sudah dibuat.
+
+- [ ] Tetapkan asset classification untuk session, credential, token, PII,
+      dokumen, database, log, dan audit.
+- [ ] Gambar trust boundary browser -> Next/tRPC -> service -> Prisma/SISTER.
+- [ ] Dokumentasikan threat model untuk auth takeover, IDOR, cross-PT access,
+      CSRF, XSS, injection, SSRF, malicious file, replay, dan secret leakage.
+- [ ] Tetapkan security invariant SEC-01 sampai SEC-12 atau sesuaikan dengan
+      project profile external system.
+- [ ] Pilih auth/session provider, cookie policy, CSRF strategy, rate limit,
+      secret manager, log sink, dan security reviewer.
+- [ ] Tetapkan kebijakan PII minimization, encryption, retention, backup, dan
+      restore untuk database/log/audit.
+- [ ] Tetapkan severity, accepted-risk owner, due date, dan compensating control.
+- [ ] Buat security audit plan untuk design, pull request, UAT, release, dan
+      periodic review.
+
+## 1. Foundation repository
+
+- [ ] Inisialisasi Next.js, React, dan TypeScript.
+- [ ] Tambahkan lint, format, unit test, dan typecheck.
+- [ ] Tambahkan PostgreSQL dan Prisma untuk metadata lokal.
+- [ ] Terapkan nama tabel dan kolom PostgreSQL lowercase `snake_case` melalui
+      `@@map()` dan `@map()` bila diperlukan.
+- [ ] Tambahkan `@trpc/server`, `@trpc/client`,
+      `@trpc/tanstack-react-query`, `@tanstack/react-query`, dan Zod.
+- [ ] Buat transport tRPC pada `app/api/trpc/[trpc]/route.ts`.
+- [ ] Buat root router dan context tRPC yang memeriksa session, permission, dan
+      integration context.
+- [ ] Tambahkan environment example tanpa credential aktual.
+- [ ] Terapkan struktur modul dari architecture.md.
+- [ ] Buat module-first folder untuk setiap fitur, misalnya
+      `src/modules/pegawai/{page,api,widget,repository,schema,type}`.
+- [ ] Tempatkan primitive pada `src/component/ui/` dan widget generik pada
+      `src/component/widget/`.
+- [ ] Buat `src/const/theme.ts` sebagai sumber warna, font, dan chart palette.
+- [ ] Salin token CSS dan global contract dari design-system.md.
+- [ ] Implementasikan theme light, dark, dan system.
+- [ ] Terapkan HTTPS-only production, Secure/HttpOnly/SameSite cookie, dan
+      security headers termasuk CSP sesuai deployment.
+- [ ] Terapkan default-deny CORS, CSRF protection untuk cookie mutation, body
+      size limit, rate limit, timeout, dan concurrency limit.
+- [ ] Tambahkan secret injection dari secret manager tanpa credential di
+      repository, browser, build artifact, atau log.
+- [ ] Implementasikan layout sidebar 224px, topbar, page header, dan responsive
+      contract.
+- [ ] Tambahkan `apexcharts` dan `react-apexcharts`, lalu buat wrapper
+      `ReportChart` client-only sesuai design-system.md.
+- [ ] Implementasikan primitive Button, IconButton, Select, DataTable, StatusBadge,
+      Dialog, Tabs, HelpTip, State, dan Pagination.
+- [ ] Uji primitive dengan keyboard dan screen reader semantics.
+
+## 2. Schema dan persistence lokal
+
+- [ ] Implementasikan app_user.
+- [ ] Implementasikan sister_integration dengan credential_ref.
+- [ ] Implementasikan sister_reference_cache.
+- [ ] Implementasikan sister_sdm_index_cache tanpa NIK, NPWP, alamat, atau
+      data keluarga.
+- [ ] Implementasikan sister_operation.
+- [ ] Implementasikan `security_audit_event` terpisah dari `sister_operation`
+      untuk auth, authorization, policy, secret, dan suspicious events.
+- [ ] Implementasikan sister_ajuan_cache bila tracking ajuan masuk MVP.
+- [ ] Implementasikan sister_document_reference bila metadata dokumen perlu
+      ditampilkan lintas halaman.
+- [ ] Tambahkan index untuk integration_id, id_sdm, external ID, status, dan
+      fetched_at sesuai query aktual.
+- [ ] Pastikan token SISTER tidak pernah dipersist sebagai plain text.
+- [ ] Pastikan user aplikasi biasa tidak dapat mengubah/menghapus security audit
+      dan perubahan audit dapat terdeteksi.
+- [ ] Tambahkan retention policy untuk cache dan audit.
+
+## 3. SISTER client dan security boundary
+
+- [ ] Generate tipe dari YAML resmi setelah YAML tersedia.
+- [ ] Implementasikan token provider dengan TTL 60 menit.
+- [ ] Implementasikan POST /authorize di server saja.
+- [ ] Implementasikan header Bearer tanpa mengembalikan token ke browser.
+- [ ] Implementasikan fetch wrapper untuk JSON, multipart, dan binary.
+- [ ] Implementasikan router dan procedure tRPC per capability module, bukan
+      generic proxy atau salinan 1:1 seluruh endpoint SISTER.
+- [ ] Pastikan router tRPC hanya mengatur input, auth, permission, dan delegasi
+      ke service/use case.
+- [ ] Pastikan output tRPC berupa DTO yang aman dan tidak mengembalikan object
+      Prisma mentah, bearer token, atau response sensitif penuh.
+- [ ] Gunakan Route Handler khusus untuk upload multipart dan download binary.
+- [ ] Implementasikan parsing response 200, 204, dan error message/detail.
+- [ ] Implementasikan bounded retry untuk GET yang aman.
+- [ ] Blokir automatic retry untuk POST, PUT, dan DELETE yang hasilnya tidak
+      pasti.
+- [ ] Implementasikan request fingerprint lokal.
+- [ ] Redact credential, token, dan PII pada structured log.
+- [ ] Emit `security_audit_event` untuk login/session, authz denied, CSRF, rate
+      limit, input/file rejection, secret failure, dan config change.
+- [ ] Pastikan tRPC context memvalidasi session, actor, permission, dan
+      integration/PT sebelum procedure berjalan.
+- [ ] Uji bahwa output tRPC tidak mengandung token, secret, raw Prisma object,
+      atau PII yang tidak dibutuhkan.
+- [ ] Tambahkan timeout yang dikonfirmasi pada gate kontrak.
+- [ ] Tambahkan SSRF protection dengan allowlist base URL.
+- [ ] Validasi scheme/host/IP dan matikan redirect outbound yang tidak diperlukan.
+- [ ] Pastikan route internal tidak menerima arbitrary path proxy.
+
+### 3.1 Boundary debugging
+
+- [ ] Catat jalur debug setiap procedure: route tRPC -> router -> service/use
+      case -> repository atau SISTER adapter.
+- [ ] Catat jalur debug setiap halaman: route `app/` -> module `page/` ->
+      widget -> component UI.
+- [ ] Pastikan error boundary dan log correlation ID menunjukkan module serta
+      procedure tanpa membocorkan credential.
+
+## 4. MVP read-only
+
+Scope awal yang disarankan:
+
+- [ ] GET /referensi/profil_pt untuk identitas PT.
+- [ ] GET /referensi/sdm untuk pencarian SDM.
+- [ ] GET /referensi/semester untuk filter semester.
+- [ ] GET /data_pribadi/profil/{id_sdm}.
+- [ ] GET /data_pribadi/kepegawaian/{id_sdm}.
+- [ ] GET /penugasan dengan detail bila dibutuhkan.
+- [ ] GET /pendidikan_formal dan detailnya.
+- [ ] GET /bkd/laporan_akhir_bkd.
+- [ ] GET /bkd/pendidikan, /ajar, /tunjang, /pengmas, dan /penelitian.
+- [ ] GET satu atau lebih referensi bertingkat yang dibutuhkan halaman.
+- [ ] Bedakan loading, empty, error, unauthorized, dan stale cache.
+- [ ] Pastikan resource read-only tidak menampilkan tombol mutation.
+- [ ] Tambahkan route URL langsung yang bertahan setelah refresh.
+
+MVP read-only harus divalidasi dahulu sebelum menambah write operation.
+
+## 5. Halaman dan UX MVP
+
+- [ ] Halaman login atau konfigurasi auth sesuai keputusan gate.
+- [ ] Halaman dashboard ringkas dengan data yang benar-benar tersedia dari API.
+- [ ] Halaman pencarian SDM.
+- [ ] Halaman detail SDM dengan tabs yang tetap berada dalam konteks SDM.
+- [ ] Halaman BKD dengan filter semester.
+- [ ] Halaman referensi atau selector yang diperlukan oleh form.
+- [ ] Halaman status integrasi dan health check yang tidak membocorkan secret.
+- [ ] Gunakan `ReportChart` berbasis ApexCharts hanya untuk angka agregat yang
+      benar-benar tersedia dari response SISTER.
+- [ ] State permission untuk VIEWER, REVIEWER, OPERATOR, dan ADMIN.
+- [ ] Tooltip untuk icon-only button.
+- [ ] Tabel scroll horizontal hanya pada table shell.
+- [ ] Test light/dark pada 1280, 1024, 390, dan 320 pixel.
+
+## 6. Satu workflow write terpilih
+
+Jangan membuka seluruh CRUD sebelum satu workflow lolos UAT.
+
+- [ ] Pilih satu domain berdasarkan kebutuhan PT dan role credential.
+- [ ] Tandai endpoint create, detail, update, delete, atau ajuan yang dipakai.
+- [ ] Implementasikan schema Zod berdasarkan YAML/response aktual.
+- [ ] Implementasikan form dengan field wajib, enum, date, dan batas panjang.
+- [ ] Implementasikan selector referensi yang benar.
+- [ ] Implementasikan fetch detail sebelum PUT.
+- [ ] Implementasikan full payload untuk PUT.
+- [ ] Implementasikan preservasi document ID.
+- [ ] Implementasikan confirm untuk DELETE bila domain mendukung delete.
+- [ ] Implementasikan response 204 tanpa JSON parse.
+- [ ] Implementasikan mode WS-BASIC sebagai ajuan.
+- [ ] Implementasikan mode WS-PRO sebagai perubahan langsung sesuai response.
+- [ ] Catat semua mutation dalam sister_operation.
+- [ ] Re-fetch detail/list setelah mutation berhasil.
+- [ ] Uji duplicate 409 dan network outcome tidak pasti.
+
+## 7. Dokumen
+
+- [ ] Implementasikan file validation setelah aturan resmi dikonfirmasi.
+- [ ] Terapkan extension allowlist, MIME/content sniffing, size limit, filename
+      normalization, dan random storage key.
+- [ ] Pastikan file tidak disimpan executable di web root dan download selalu
+      memeriksa session, permission, ownership, serta document ID.
+- [ ] Putuskan malware/DLP scanner dan catat limitation bila belum tersedia.
+- [ ] Implementasikan POST /dokumen untuk file.
+- [ ] Implementasikan POST /dokumen untuk tautan tanpa file.
+- [ ] Implementasikan attach document ID ke payload utama.
+- [ ] Implementasikan metadata detail.
+- [ ] Implementasikan binary download melalui server route.
+- [ ] Pastikan browser tidak menyimpan bearer token untuk download.
+- [ ] Catat document ID bila operasi utama gagal.
+- [ ] Tentukan dan dokumentasikan cleanup orphan document dengan konfirmasi.
+
+## 8. Ajuan dan rekonsiliasi
+
+- [ ] Buat adapter status ajuan untuk tiap resource yang memiliki endpoint
+      /ajuan.
+- [ ] Tampilkan jenis ajuan Baru, Ubah, dan Hapus.
+- [ ] Tampilkan tanggal ajuan, tanggal verifikasi, umur, status, dan keterangan.
+- [ ] Tampilkan detail_perubahan bila tersedia.
+- [ ] Bedakan data master dengan data ajuan.
+- [ ] Sediakan refresh manual status ajuan.
+- [ ] Sediakan daftar operasi NEEDS_REVIEW.
+- [ ] Sediakan pemeriksaan ulang berdasarkan external ID atau fingerprint.
+- [ ] Jangan retry otomatis mutation dengan hasil yang belum diketahui.
+
+## 9. Perluasan domain setelah MVP
+
+Setiap domain berikut hanya boleh dikerjakan setelah masuk PRD release yang
+jelas dan memiliki UAT:
+
+- [ ] Anggota Profesi.
+- [ ] Bahan Ajar.
+- [ ] Beasiswa.
+- [ ] Detasering.
+- [ ] Diklat.
+- [ ] Inpassing.
+- [ ] Jabatan Fungsional.
+- [ ] Jabatan Struktural.
+- [ ] Kekayaan Intelektual.
+- [ ] Kesejahteraan.
+- [ ] Kolaborator Eksternal.
+- [ ] Orasi Ilmiah.
+- [ ] Pembicara.
+- [ ] Penelitian.
+- [ ] Pengabdian.
+- [ ] Pengelola Jurnal.
+- [ ] Penghargaan.
+- [ ] Penunjang Lain.
+- [ ] Publikasi.
+- [ ] Riwayat Pekerjaan.
+- [ ] Sertifikasi Profesi.
+- [ ] Nilai Tes dan ajuan.
+- [ ] Tugas Tambahan.
+- [ ] Tunjangan.
+- [ ] Visiting Scientist.
+- [ ] Kelas Kuliah dan dokumen tautan.
+
+Domain bimbing dosen, bimbingan mahasiswa, pengajaran, dan pengujian mahasiswa
+harus memiliki keputusan khusus untuk nested bidang_ilmu karena PDF sekaligus
+menyatakan data bersumber PDDIKTI/read-only dan menyediakan beberapa PUT.
+
+## 10. Quality, security, dan release
+
+- [ ] Unit test payload dan error mapping.
+- [ ] Contract test terhadap YAML resmi.
+- [ ] Integration test dengan UAT.
+- [ ] Unit/integration test untuk procedure tRPC, auth context, permission, dan
+      DTO output.
+- [ ] Browser test untuk happy path dan semua state UI.
+- [ ] Test access control pada setiap internal API route.
+- [ ] Test token expiry.
+- [ ] Test 204, 400, 401, 403, 404, 405, 409, dan 500.
+- [ ] Test upload, download, dan MIME behavior.
+- [ ] Test timeout dengan outcome NEEDS_REVIEW.
+- [ ] Audit unauthenticated, wrong-role, IDOR, cross-user, dan cross-PT/
+      integration access.
+- [ ] Audit CSRF/CORS, rate limit, request size, malformed input, error
+      disclosure, XSS, injection, SSRF, open redirect, dan path traversal.
+- [ ] Audit secret/token presence pada client bundle, network, storage, log,
+      cache, error, database, backup, dan artifact.
+- [ ] Review Prisma migration, raw query, DB runtime privilege, backup/restore,
+      dan access control `security_audit_event`.
+- [ ] Jalankan dependency audit, secret scan, container/CI review, HTTPS,
+      cookie, CSP, dan security header verification.
+- [ ] Lakukan security audit readback: event dibuat, dapat ditelusuri dengan
+      request ID, tidak menyimpan secret, dan perubahan/penghapusan terdeteksi.
+- [ ] Audit log tidak mengandung secret atau PII berlebihan.
+- [ ] Dependency audit dan secret scan.
+- [ ] HTTPS reverse proxy tervalidasi.
+- [ ] Backup database terenkripsi dan restore test.
+- [ ] Runbook credential rotation.
+- [ ] Dokumentasikan perbedaan source test, UAT, browser QA, dan production
+      evidence.
+
+## 11. Definition of done
+
+Satu fitur SISTER dianggap selesai apabila:
+
+1. endpoint dan field-nya ada pada YAML atau sudah divalidasi di UAT;
+2. schema, architecture, PRD, TODO, dan security contract konsisten;
+3. permission dan role behavior jelas;
+4. loading, empty, error, success, forbidden, dan stale state tersedia;
+5. write memiliki full payload dan audit;
+6. dokumen dan status ajuan ditangani bila relevan;
+7. unit/contract/integration test sesuai levelnya lulus;
+8. browser QA design system lulus;
+9. module, component, dan widget berada pada boundary folder yang disepakati;
+10. table dan column database fisik mengikuti `snake_case`;
+11. tidak ada token atau credential pada client/log;
+12. security audit memiliki status, evidence, owner, dan residual risk yang
+    jelas;
+13. tidak ada finding Critical/High yang belum memiliki keputusan tertulis;
+14. hasil production readiness tidak diklaim dari test lokal saja.
+
+## 12. Explicit out of scope
+
+- scraping halaman SISTER;
+- login dosen individual tanpa dukungan SSO/API resmi;
+- direct database SISTER;
+- local master data yang tidak punya endpoint SISTER;
+- sinkronisasi seluruh data secara massal tanpa kebutuhan;
+- webhook/callback yang belum tersedia pada PDF;
+- OCR, AI, dan enrichment eksternal;
+- mobile app;
+- payment atau workflow non-SISTER;
+- analytics yang membutuhkan data yang tidak diberikan API.

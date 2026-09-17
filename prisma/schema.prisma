@@ -1,0 +1,171 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum AppRole {
+  ADMIN
+  OPERATOR
+  REVIEWER
+  VIEWER
+
+  @@map("app_role")
+}
+
+enum SisterOperationStatus {
+  PENDING
+  SUCCEEDED
+  FAILED
+  NEEDS_REVIEW
+
+  @@map("sister_operation_status")
+}
+
+enum SecuritySeverity {
+  INFO
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+
+  @@map("security_severity")
+}
+
+enum SecurityOutcome {
+  SUCCESS
+  DENIED
+  FAILED
+  BLOCKED
+  DETECTED
+
+  @@map("security_outcome")
+}
+
+model AppUser {
+  id              String               @id @default(uuid()) @db.Uuid
+  email           String               @unique @db.VarChar(320)
+  name            String               @db.VarChar(160)
+  role            AppRole              @default(VIEWER)
+  isActive        Boolean              @default(true) @map("is_active")
+  createdAt       DateTime             @default(now()) @map("created_at")
+  updatedAt       DateTime             @updatedAt @map("updated_at")
+  operations      SisterOperation[]    @relation("sister_operation_actor")
+  securityEvents  SecurityAuditEvent[] @relation("security_audit_actor")
+  securityReviews SecurityAuditEvent[] @relation("security_audit_reviewer")
+
+  @@map("app_user")
+}
+
+model SisterIntegration {
+  id                String                   @id @default(uuid()) @db.Uuid
+  externalPtId      String?                  @map("external_pt_id") @db.VarChar(128)
+  baseUrl           String                   @map("base_url") @db.VarChar(2048)
+  apiVersion        String                   @default("1.0.0") @map("api_version") @db.VarChar(32)
+  credentialRef     String                   @map("credential_ref") @db.VarChar(255)
+  expectedRole      String?                  @map("expected_role") @db.VarChar(32)
+  isEnabled         Boolean                  @default(false) @map("is_enabled")
+  lastHealthAt      DateTime?                @map("last_health_at")
+  createdAt         DateTime                 @default(now()) @map("created_at")
+  updatedAt         DateTime                 @updatedAt @map("updated_at")
+  referenceCaches   SisterReferenceCache[]  
+  sdmIndexCaches    SisterSdmIndexCache[]
+  operations        SisterOperation[]
+  securityEvents    SecurityAuditEvent[]
+
+  @@index([isEnabled])
+  @@map("sister_integration")
+}
+
+model SisterReferenceCache {
+  id            String            @id @default(uuid()) @db.Uuid
+  integrationId String            @map("integration_id") @db.Uuid
+  endpoint      String            @db.VarChar(255)
+  queryHash     String            @map("query_hash") @db.VarChar(128)
+  payloadJson   Json              @map("payload_json")
+  fetchedAt     DateTime          @default(now()) @map("fetched_at")
+  expiresAt     DateTime          @map("expires_at")
+  lastError     String?           @map("last_error") @db.Text
+  integration   SisterIntegration @relation(fields: [integrationId], references: [id], onDelete: Cascade)
+
+  @@unique([integrationId, endpoint, queryHash])
+  @@index([expiresAt])
+  @@map("sister_reference_cache")
+}
+
+model SisterSdmIndexCache {
+  integrationId      String            @map("integration_id") @db.Uuid
+  idSdm              String            @map("id_sdm") @db.VarChar(128)
+  namaSdm            String            @map("nama_sdm") @db.VarChar(255)
+  nidn               String?           @db.VarChar(64)
+  nip                String?           @db.VarChar(64)
+  nuptk              String?           @db.VarChar(64)
+  namaStatusAktif    String?           @map("nama_status_aktif") @db.VarChar(128)
+  namaStatusPegawai  String?           @map("nama_status_pegawai") @db.VarChar(128)
+  jenisSdm           String?           @map("jenis_sdm") @db.VarChar(128)
+  fetchedAt          DateTime          @default(now()) @map("fetched_at")
+  integration        SisterIntegration @relation(fields: [integrationId], references: [id], onDelete: Cascade)
+
+  @@id([integrationId, idSdm])
+  @@index([integrationId, namaSdm])
+  @@index([integrationId, nidn])
+  @@index([integrationId, nip])
+  @@map("sister_sdm_index_cache")
+}
+
+model SisterOperation {
+  id                  String                @id @default(uuid()) @db.Uuid
+  integrationId       String                @map("integration_id") @db.Uuid
+  actorUserId         String?               @map("actor_user_id") @db.Uuid
+  method              String                @db.VarChar(8)
+  pathTemplate        String                @map("path_template") @db.VarChar(512)
+  resourceType        String                @map("resource_type") @db.VarChar(128)
+  resourceId          String?               @map("resource_id") @db.VarChar(128)
+  requestFingerprint  String                @map("request_fingerprint") @db.VarChar(128)
+  requestRedactedJson Json?                 @map("request_redacted_json")
+  responseStatus      Int?                  @map("response_status")
+  externalId         String?               @map("external_id") @db.VarChar(128)
+  localStatus         SisterOperationStatus @default(PENDING) @map("local_status")
+  externalMessage     String?               @map("external_message") @db.Text
+  externalDetail      String?               @map("external_detail") @db.Text
+  startedAt           DateTime              @default(now()) @map("started_at")
+  finishedAt          DateTime?             @map("finished_at")
+  integration         SisterIntegration     @relation(fields: [integrationId], references: [id], onDelete: Cascade)
+  actorUser           AppUser?              @relation("sister_operation_actor", fields: [actorUserId], references: [id], onDelete: SetNull)
+
+  @@index([integrationId, startedAt])
+  @@index([integrationId, localStatus])
+  @@index([actorUserId, startedAt])
+  @@map("sister_operation")
+}
+
+model SecurityAuditEvent {
+  id                  String            @id @default(uuid()) @db.Uuid
+  eventType           String            @map("event_type") @db.VarChar(128)
+  severity            SecuritySeverity
+  outcome             SecurityOutcome
+  actorUserId         String?           @map("actor_user_id") @db.Uuid
+  integrationId       String?           @map("integration_id") @db.Uuid
+  requestId           String            @map("request_id") @db.VarChar(128)
+  routeOrProcedure    String            @map("route_or_procedure") @db.VarChar(512)
+  targetType          String?           @map("target_type") @db.VarChar(128)
+  targetId            String?           @map("target_id") @db.VarChar(128)
+  sourceIpHash        String?           @map("source_ip_hash") @db.VarChar(128)
+  userAgentHash       String?           @map("user_agent_hash") @db.VarChar(128)
+  metadataRedactedJson Json?            @map("metadata_redacted_json")
+  createdAt           DateTime          @default(now()) @map("created_at")
+  reviewedAt          DateTime?         @map("reviewed_at")
+  reviewedBy          String?           @map("reviewed_by") @db.Uuid
+  actorUser           AppUser?          @relation("security_audit_actor", fields: [actorUserId], references: [id], onDelete: SetNull)
+  integration         SisterIntegration? @relation(fields: [integrationId], references: [id], onDelete: SetNull)
+  reviewer            AppUser?          @relation("security_audit_reviewer", fields: [reviewedBy], references: [id], onDelete: SetNull)
+
+  @@index([createdAt])
+  @@index([severity, outcome, createdAt])
+  @@index([actorUserId, createdAt])
+  @@index([integrationId, createdAt])
+  @@map("security_audit_event")
+}
