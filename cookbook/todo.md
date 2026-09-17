@@ -108,6 +108,20 @@ lokal dan tidak mengubah database SISTER.
 - [ ] Cache read/write belum diuji terhadap PostgreSQL nyata dan belum memiliki
       job retention/cleanup.
 
+## Security audit readback checkpoint: 2026-09-17
+
+- [x] Repository audit hanya memilih field DTO yang diperlukan dan memakai
+      filter severity/outcome/event serta pagination terbatas.
+- [x] Procedure `security.audit_list` hanya dapat dipanggil oleh role lokal
+      `ADMIN` dan authorization denial dicatat sebagai security event.
+- [x] Halaman `/audit` membedakan forbidden, database unavailable, empty, dan
+      data state.
+- [x] Metadata diaudit ulang melalui redaction sebelum dikirim ke UI; source IP
+      hash dan user-agent hash tidak dikirim pada DTO readback.
+- [x] Unit test repository, service, dan role boundary lulus.
+- [ ] Audit readback belum diverifikasi dengan PostgreSQL migration dan user
+      ADMIN nyata pada UAT.
+
 ## 0. Gate kontrak eksternal
 
 - [ ] Identifikasi perguruan tinggi target dan instance SISTER yang akan dipakai.

@@ -36,3 +36,28 @@ export const protectedProcedure = publicProcedure.use(async ({ ctx, next, path }
     },
   });
 });
+
+export const adminProcedure = protectedProcedure.use(async ({ ctx, next, path }) => {
+  if (ctx.user.role !== "ADMIN") {
+    void recordSecurityAuditEvent({
+      event_type: "authorization_denied",
+      severity: "HIGH",
+      outcome: "DENIED",
+      actor_user_id: ctx.user.id,
+      request_id: ctx.requestId,
+      route_or_procedure: path,
+      metadata: {
+        reason: "role_not_allowed",
+        required_role: "ADMIN",
+        actual_role: ctx.user.role,
+      },
+    });
+
+    throw new TRPCError({
+      code: "FORBIDDEN",
+      message: "Akses audit security membutuhkan role ADMIN",
+    });
+  }
+
+  return next();
+});

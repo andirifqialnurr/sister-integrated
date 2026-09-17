@@ -13,7 +13,7 @@ import { cn } from "@/lib/cn";
 
 type NavigationItem = {
   label: string;
-  href: "/" | "/pegawai" | "#referensi" | "#pengajuan" | "#dokumen" | "#audit";
+  href: "/" | "/pegawai" | "/audit" | "#referensi" | "#pengajuan" | "#dokumen";
   icon: LucideIcon;
 };
 
@@ -22,7 +22,7 @@ const navigationItems: NavigationItem[] = [
   { label: "Pegawai", href: "/pegawai", icon: UsersRound },
   { label: "Referensi", href: "#referensi", icon: ClipboardCheck },
   { label: "Pengajuan", href: "#pengajuan", icon: FileText },
-  { label: "Audit security", href: "#audit", icon: ShieldCheck },
+  { label: "Audit security", href: "/audit", icon: ShieldCheck },
 ];
 
 export function Sidebar({ activeLabel = "Ikhtisar" }: { activeLabel?: string }) {
