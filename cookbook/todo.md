@@ -56,6 +56,30 @@ Milestone pertama sudah mulai dikerjakan sebagai read-only vertical slice:
 - [ ] Auth/session provider production, PostgreSQL migration, credential UAT,
       dan live contract test belum tersedia.
 
+## Security hardening checkpoint: 2026-09-17
+
+Checkpoint ini membuktikan source-level dan unit-test control pada transport
+tRPC. Evidence ini belum menjadi bukti security production.
+
+- [x] Request ID tervalidasi atau dibuat server-side, lalu diteruskan konsisten
+      ke context tRPC dan response policy error.
+- [x] Origin dan `Sec-Fetch-Site` cross-site ditolak dengan default-deny policy;
+      allowlist dapat dikonfigurasi melalui `APP_ALLOWED_ORIGINS`.
+- [x] Transport tRPC hanya menerima `GET` dan `POST`; POST harus JSON.
+- [x] URL dan body request memiliki batas ukuran; body POST tetap diukur dari
+      bytes aktual saat `Content-Length` tidak tersedia.
+- [x] Rate limit fixed-window tersedia untuk single instance dan mengirim
+      `Retry-After` serta header limit pada response 429.
+- [x] Event policy denial dan authorization denial diarahkan ke model
+      `security_audit_event` melalui service yang melakukan redaction.
+- [x] Unit test policy, rate limiter, dan audit redaction lulus.
+- [ ] Rate limit production multi-instance dengan Redis atau store terdistribusi
+      belum dipilih.
+- [ ] Audit persistence, retention, alert, dan append-only control belum diuji
+      terhadap PostgreSQL migration/UAT.
+- [ ] CSRF token khusus untuk mutation cookie belum diaktifkan karena release
+      saat ini hanya memiliki capability read-only.
+
 ## 0. Gate kontrak eksternal
 
 - [ ] Identifikasi perguruan tinggi target dan instance SISTER yang akan dipakai.
