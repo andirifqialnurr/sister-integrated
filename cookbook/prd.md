@@ -20,7 +20,8 @@ merupakan bagian dari product scope.
 - Sumber batas capability: [SISTER Web Service PT.pdf](../SISTER%20Web%20Service%20PT.pdf).
 - Scope reference: 236 endpoint unik dalam 39 domain; tidak seluruhnya masuk
   release pertama.
-- Module awal read-only: `pegawai`, `referensi`, `bkd`, dan `penugasan`, dengan page, API
+- Module awal read-only: `pegawai`, `referensi`, `bkd`, `penugasan`, dan
+  `pendidikan_formal`, dengan page, API
   procedure, service, schema, widget, dan repository khusus (bila dibutuhkan)
   berada di folder module masing-masing.
 - Internal API: tRPC typed API; upload multipart dan download binary memakai
@@ -198,6 +199,10 @@ Modul Penugasan read-only mencakup list dan detail sesuai halaman PDF 209-210.
 List memakai SDM yang dipilih dari referensi dan detail hanya dapat dibuka dari
 ID hasil list atau URL yang tetap dilindungi validasi serta session.
 
+Modul Pendidikan Formal read-only mencakup list dan detail sesuai halaman PDF
+153-158. Endpoint POST, PUT, DELETE, dan ajuan pendidikan formal belum termasuk
+release slice ini.
+
 ### 7.2 Release pertama: UI
 
 - login aplikasi atau auth boundary sesuai keputusan;
@@ -345,6 +350,23 @@ Acceptance:
   berbeda;
 - tidak ada create, edit, delete, pagination, atau status bisnis tambahan di
   luar kontrak endpoint.
+
+### FR-06b Pendidikan formal
+
+User dapat memilih SDM dan melihat daftar serta detail riwayat pendidikan formal.
+
+Acceptance:
+
+- list memanggil `GET /pendidikan_formal` dengan `id_sdm` dari `/referensi/sdm`;
+- detail memanggil `GET /pendidikan_formal/{id}` dengan ID yang berasal dari
+  hasil list;
+- field list dan detail mengikuti kontrak PDF halaman 153-158, termasuk
+  metadata `dokumen` pada detail;
+- perbedaan tipe `jenis_ajuan` list dan detail tidak dipaksa menjadi satu tipe;
+- empty, error, unauthorized, forbidden, dan not found ditampilkan sebagai
+  state yang berbeda;
+- tidak ada create, edit, delete, ajuan, pagination, atau binary download pada
+  slice ini.
 
 ### FR-06 Reference options
 

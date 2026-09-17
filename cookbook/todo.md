@@ -32,7 +32,8 @@ turunan dari [schema.md](./schema.md), [architecture.md](./architecture.md),
 - Shared composite: `src/component/widget/`.
 - Theme: `src/const/theme.ts`, primary hijau, chart ApexCharts.
 - Module awal read-only: `src/modules/pegawai/`, `src/modules/referensi/`,
-  `src/modules/bkd/`, dan `src/modules/penugasan/`.
+  `src/modules/bkd/`, `src/modules/penugasan/`, dan
+  `src/modules/pendidikan_formal/`.
 - Security contract: `security.md`, dengan `security_audit_event` terpisah dari
   `sister_operation`.
 
@@ -192,6 +193,28 @@ yang dibuka.
 - [x] Test schema, adapter, service, dan router lulus.
 - [ ] Response live Penugasan belum diuji karena credential dan UAT belum
       tersedia.
+
+## Pendidikan formal read-only checkpoint: 2026-09-17
+
+Checkpoint ini hanya mencakup `GET /pendidikan_formal` dan
+`GET /pendidikan_formal/{id}` pada PDF halaman 153-158. Endpoint POST, PUT,
+DELETE, ajuan, pagination, dan binary download belum dibuka.
+
+- [x] Schema runtime list mengikuti 7 field response, query wajib `id_sdm`
+      bertipe UUID, dan `jenis_ajuan` bertipe integer sesuai PDF halaman 153.
+- [x] Schema runtime detail mengikuti field pendidikan formal lengkap,
+      `jenis_ajuan` bertipe string, dan metadata dokumen sesuai PDF halaman
+      155-158.
+- [x] Adapter live memakai path tetap dan hanya mengirim query `id_sdm` pada
+      list; detail memakai ID path hasil list.
+- [x] Fixture, service safe DTO, protected tRPC procedures, dan route
+      `/pendidikan_formal` serta `/pendidikan_formal/{id_pendidikan_formal}`
+      tersedia dalam folder module `pendidikan_formal`.
+- [x] UI memilih SDM dari `/referensi/sdm`, membedakan loading, empty, error,
+      unauthorized, forbidden, not found, dan source.
+- [x] Test schema, adapter, service, dan router lulus.
+- [ ] Response live Pendidikan Formal belum diuji karena credential dan UAT
+      belum tersedia.
 
 ## 0. Gate kontrak eksternal
 

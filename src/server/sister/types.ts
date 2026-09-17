@@ -148,6 +148,60 @@ export const penugasanDetailSchema = penugasanSummarySchema
   })
   .passthrough();
 
+export const pendidikanFormalDocumentSchema = z
+  .object({
+    id: z.string().min(1),
+    nama: z.string(),
+    jenis_dokumen: z.string(),
+    nama_file: z.string(),
+    jenis_file: z.string(),
+    tanggal_upload: z.string(),
+    tautan: z.string(),
+    keterangan: z.string(),
+  })
+  .passthrough();
+
+const pendidikanFormalBaseSchema = z.object({
+  id: z.string().min(1),
+  jenjang_pendidikan: z.string(),
+  gelar_akademik: z.string(),
+  bidang_studi: z.string(),
+  nama_perguruan_tinggi: z.string(),
+  tahun_lulus: z.number().int(),
+});
+
+export const pendidikanFormalSummarySchema = pendidikanFormalBaseSchema
+  .extend({
+    jenis_ajuan: z.number().int(),
+  })
+  .passthrough();
+
+export const pendidikanFormalSummaryListSchema = z.array(pendidikanFormalSummarySchema);
+
+export const pendidikanFormalDetailSchema = pendidikanFormalBaseSchema
+  .extend({
+    jenis_ajuan: z.string(),
+    kategori_kegiatan: z.string(),
+    id_sdm: z.string(),
+    id_program_studi: z.string(),
+    nama_program_studi: z.string(),
+    id_jenjang_pendidikan: z.number().int(),
+    id_gelar_akademik: z.number().int(),
+    id_bidang_studi: z.number().int(),
+    tahun_masuk: z.number().int(),
+    tanggal_lulus: z.string(),
+    nomor_induk: z.string(),
+    jumlah_semester: z.number().int(),
+    jumlah_sks: z.number().int(),
+    ipk: z.number(),
+    sk_penyetaraan: z.string(),
+    tanggal_sk_penyetaraan: z.string(),
+    nomor_ijazah: z.string(),
+    judul_tugas_akhir: z.string(),
+    dokumen: z.array(pendidikanFormalDocumentSchema),
+  })
+  .passthrough();
+
 export type SdmSummary = z.infer<typeof sdmSummarySchema>;
 export type SdmProfile = z.infer<typeof sdmProfileSchema>;
 export type SdmEmployment = z.infer<typeof sdmEmploymentSchema>;
@@ -157,3 +211,6 @@ export type BkdLaporanAkhir = z.infer<typeof bkdLaporanAkhirSchema>;
 export type BkdActivity = z.infer<typeof bkdActivitySchema>;
 export type PenugasanSummary = z.infer<typeof penugasanSummarySchema>;
 export type PenugasanDetail = z.infer<typeof penugasanDetailSchema>;
+export type PendidikanFormalDocument = z.infer<typeof pendidikanFormalDocumentSchema>;
+export type PendidikanFormalSummary = z.infer<typeof pendidikanFormalSummarySchema>;
+export type PendidikanFormalDetail = z.infer<typeof pendidikanFormalDetailSchema>;

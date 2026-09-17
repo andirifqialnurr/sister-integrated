@@ -20,9 +20,9 @@ bersifat portable. Bagian `Project Profile` berisi keputusan untuk repository
 - Theme configuration: `src/const/theme.ts`, dengan warna primary hijau dan
   chart ApexCharts.
 - Module convention: setiap fitur memiliki satu folder module, misalnya
-  `src/modules/pegawai/`, `src/modules/referensi/`, `src/modules/bkd/`, atau
-  `src/modules/penugasan/` dengan subfolder `page/`, `api/`, dan `widget/`
-  sesuai kebutuhan.
+  `src/modules/pegawai/`, `src/modules/referensi/`, `src/modules/bkd/`,
+  `src/modules/penugasan/`, atau `src/modules/pendidikan_formal/` dengan
+  subfolder `page/`, `api/`, dan `widget/` sesuai kebutuhan.
 
 Pada project lain, ganti external system, framework, persistence, theme, dan
 nama module pada profile. Pertahankan boundary keamanan dan aturan adaptasi
@@ -222,6 +222,14 @@ Mapping untuk project `sister-integrated`:
       -> src/modules/penugasan/widget/penugasan_workspace_widget.tsx
       -> src/app/penugasan/[id_penugasan]/page.tsx (route detail)
 
+    src/app/pendidikan_formal/page.tsx
+      -> src/modules/pendidikan_formal/page/pendidikan_formal_page.tsx
+      -> src/modules/pendidikan_formal/api/pendidikan_formal_router.ts
+      -> src/modules/pendidikan_formal/api/pendidikan_formal_service.ts
+      -> src/modules/pendidikan_formal/api/pendidikan_formal_adapter.ts
+      -> src/modules/pendidikan_formal/widget/pendidikan_formal_workspace_widget.tsx
+      -> src/app/pendidikan_formal/[id_pendidikan_formal]/page.tsx (route detail)
+
 Aturan folder:
 
 1. Folder `app/` hanya berisi route entry Next.js, loading/error boundary, dan
@@ -321,6 +329,8 @@ Capability tRPC yang disiapkan untuk MVP, bukan daftar final seluruh endpoint:
     bkd.penelitian          query
     penugasan.list          query
     penugasan.get_detail    query
+    pendidikan_formal.list       query
+    pendidikan_formal.get_detail query
     operation.get           query
     submission.get_status   query
     pegawai.update_data     mutation
@@ -434,6 +444,12 @@ Detail memakai ID penugasan yang berasal dari list dan divalidasi ulang sebagai
 UUID di procedure. List serta detail memiliki adapter dan DTO terpisah sesuai
 response PDF; tidak ada path arbitrary dan tidak ada cache lokal pada slice
 awal.
+
+Modul Pendidikan Formal memakai `id_sdm` hasil pilihan `/referensi/sdm` untuk
+list. Detail memakai ID pendidikan formal dari hasil list dan divalidasi ulang
+sebagai UUID di procedure. Schema list dan detail terpisah karena tipe
+`jenis_ajuan` pada PDF berbeda; detail hanya menampilkan metadata dokumen dan
+belum menyediakan binary download, cache, atau mutation.
 
 ## 8. Alur write dan update penuh
 

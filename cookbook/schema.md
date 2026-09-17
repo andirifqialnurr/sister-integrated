@@ -27,6 +27,9 @@ evidence auditnya.
 - Read-only assignment module mencakup `/penugasan` dan `/penugasan/{id}`;
   keduanya tetap membaca source of truth SISTER dan belum dipersist ke database
   lokal.
+- Read-only formal education module mencakup `/pendidikan_formal` dan
+  `/pendidikan_formal/{id}`; keduanya tetap membaca source of truth SISTER dan
+  belum dipersist ke database lokal.
 
 ## Cara mengadaptasi dokumen
 
@@ -404,6 +407,62 @@ List dan detail tidak memiliki parameter pagination atau mutation. UI memilih
 SDM dari `/referensi/sdm`, memilih detail dari hasil list, dan menampilkan
 empty/error state secara terpisah. Implementasi awal tidak menyimpan
 penugasan ke Prisma.
+
+### 3.6 Pendidikan formal
+
+Kontrak berikut berasal dari halaman PDF 153-158 dan menjadi batas modul
+`pendidikan_formal` read-only pada slice ini. Endpoint POST, PUT, DELETE, dan
+endpoint ajuan berada di luar scope implementasi awal.
+
+`GET /pendidikan_formal` menerima query wajib `id_sdm` bertipe UUID dan
+mengembalikan array object dengan 7 field:
+
+| Field | Tipe PDF | Keterangan |
+| --- | --- | --- |
+| id | string | ID riwayat pendidikan formal |
+| jenjang_pendidikan | string | Jenjang pendidikan |
+| gelar_akademik | string | Gelar akademik |
+| bidang_studi | string | Bidang studi |
+| nama_perguruan_tinggi | string | Nama perguruan tinggi |
+| tahun_lulus | integer | Tahun lulus |
+| jenis_ajuan | integer | ID/jenis ajuan sesuai response list PDF |
+
+`GET /pendidikan_formal/{id}` menerima path `id` bertipe UUID dan
+mengembalikan object detail dengan field berikut:
+
+| Field | Tipe PDF | Keterangan |
+| --- | --- | --- |
+| id | string | ID riwayat pendidikan formal |
+| jenjang_pendidikan | string | Jenjang pendidikan |
+| gelar_akademik | string | Gelar akademik |
+| bidang_studi | string | Bidang studi |
+| nama_perguruan_tinggi | string | Nama perguruan tinggi |
+| tahun_lulus | integer | Tahun lulus |
+| jenis_ajuan | string | Jenis ajuan pada response detail PDF |
+| kategori_kegiatan | string | Nama kategori kegiatan |
+| id_sdm | string | ID SDM pemilik data |
+| id_program_studi | string | ID program studi |
+| nama_program_studi | string | Nama program studi |
+| id_jenjang_pendidikan | integer | ID jenjang studi |
+| id_gelar_akademik | integer | ID gelar akademik |
+| id_bidang_studi | integer | ID bidang studi |
+| tahun_masuk | integer | Tahun masuk |
+| tanggal_lulus | string | Tanggal kelulusan |
+| nomor_induk | string | Nomor induk ketika menjadi mahasiswa |
+| jumlah_semester | integer | Jumlah semester yang ditempuh |
+| jumlah_sks | integer | Jumlah SKS sampai lulus |
+| ipk | number | IPK saat lulus |
+| sk_penyetaraan | string | Nomor SK penyetaraan |
+| tanggal_sk_penyetaraan | string | Tanggal SK penyetaraan |
+| nomor_ijazah | string | Nomor ijazah |
+| judul_tugas_akhir | string | Judul tesis/disertasi |
+| dokumen | array | Metadata dokumen yang menyertai data |
+
+Object pada `dokumen` memiliki 8 field string: `id`, `nama`, `jenis_dokumen`,
+`nama_file`, `jenis_file`, `tanggal_upload`, `tautan`, dan `keterangan`.
+Schema list dan detail sengaja dipisahkan karena PDF mendokumentasikan tipe
+`jenis_ajuan` yang berbeda pada kedua response. Tidak ada pagination pada kedua
+GET tersebut, dan binary download dokumen belum dibuka pada slice ini.
 
 ## 4. Inventaris domain SISTER
 

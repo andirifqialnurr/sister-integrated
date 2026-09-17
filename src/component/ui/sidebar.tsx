@@ -4,6 +4,7 @@ import {
   ClipboardCheck,
   ClipboardList,
   FileText,
+  GraduationCap,
   LayoutDashboard,
   Settings2,
   ShieldCheck,
@@ -15,7 +16,7 @@ import { cn } from "@/lib/cn";
 
 type NavigationItem = {
   label: string;
-  href: "/" | "/pegawai" | "/referensi" | "/bkd" | "/penugasan" | "/audit" | "#pengajuan" | "#dokumen";
+  href: "/" | "/pegawai" | "/referensi" | "/bkd" | "/penugasan" | "/pendidikan_formal" | "/audit" | "#pengajuan" | "#dokumen";
   icon: LucideIcon;
 };
 
@@ -25,6 +26,7 @@ const navigationItems: NavigationItem[] = [
   { label: "Referensi", href: "/referensi", icon: ClipboardCheck },
   { label: "BKD", href: "/bkd", icon: BarChart3 },
   { label: "Penugasan", href: "/penugasan", icon: ClipboardList },
+  { label: "Pendidikan Formal", href: "/pendidikan_formal", icon: GraduationCap },
   { label: "Pengajuan", href: "#pengajuan", icon: FileText },
   { label: "Audit security", href: "/audit", icon: ShieldCheck },
 ];
