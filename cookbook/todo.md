@@ -80,6 +80,26 @@ tRPC. Evidence ini belum menjadi bukti security production.
 - [ ] CSRF token khusus untuk mutation cookie belum diaktifkan karena release
       saat ini hanya memiliki capability read-only.
 
+## Prisma migration checkpoint: 2026-09-17
+
+Initial migration sudah dibuat dari `prisma/schema.prisma` dengan
+`prisma migrate diff --from-empty`. Migration ini hanya merealisasikan metadata
+lokal dan tidak mengubah database SISTER.
+
+- [x] Migration lock PostgreSQL tersedia.
+- [x] Initial migration membuat `app_user`, `sister_integration`, cache,
+      `sister_operation`, dan `security_audit_event`.
+- [x] Nama fisik table, column, enum, index, constraint, dan foreign key
+      menggunakan lowercase `snake_case`.
+- [x] Script `prisma:migrate:deploy` tersedia untuk deployment.
+- [x] Script `prisma:migrate:status` tersedia untuk pemeriksaan migration.
+- [x] Schema validation dan generated migration script berhasil diverifikasi
+      tanpa koneksi ke database.
+- [ ] Migration belum dijalankan terhadap PostgreSQL karena `DATABASE_URL`
+      lokal/UAT belum tersedia.
+- [ ] DB runtime role, backup, restore, retention, dan audit append-only belum
+      diverifikasi pada environment deployment.
+
 ## 0. Gate kontrak eksternal
 
 - [ ] Identifikasi perguruan tinggi target dan instance SISTER yang akan dipakai.
