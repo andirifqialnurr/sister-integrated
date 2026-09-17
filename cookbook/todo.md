@@ -31,8 +31,8 @@ turunan dari [schema.md](./schema.md), [architecture.md](./architecture.md),
 - Shared primitive: `src/component/ui/`.
 - Shared composite: `src/component/widget/`.
 - Theme: `src/const/theme.ts`, primary hijau, chart ApexCharts.
-- Module awal read-only: `src/modules/pegawai/`, `src/modules/referensi/`, dan
-  `src/modules/bkd/`.
+- Module awal read-only: `src/modules/pegawai/`, `src/modules/referensi/`,
+  `src/modules/bkd/`, dan `src/modules/penugasan/`.
 - Security contract: `security.md`, dengan `security_audit_event` terpisah dari
   `sister_operation`.
 
@@ -171,6 +171,27 @@ Tidak ada endpoint write, pagination, atau field tambahan yang dibuka.
       source, dan memuat tab aktivitas secara lazy.
 - [x] Test schema, adapter, service, dan router lulus.
 - [ ] Response live BKD belum diuji karena credential dan UAT belum tersedia.
+
+## Penugasan read-only checkpoint: 2026-09-17
+
+Checkpoint ini hanya mencakup `GET /penugasan` dan `GET /penugasan/{id}` pada
+PDF halaman 209-210. Tidak ada endpoint write, pagination, atau field tambahan
+yang dibuka.
+
+- [x] Schema runtime list mengikuti 8 field response `/penugasan` dan query
+      wajib `id_sdm` bertipe UUID.
+- [x] Schema runtime detail mengikuti 8 field list ditambah 9 field detail
+      yang didokumentasikan PDF.
+- [x] Adapter live memakai path tetap dan hanya mengirim query `id_sdm` pada
+      list; detail memakai ID path hasil list.
+- [x] Fixture, service safe DTO, protected tRPC procedures, dan route
+      `/penugasan` serta `/penugasan/{id_penugasan}` tersedia dalam folder module
+      `penugasan`.
+- [x] UI memilih SDM dari `/referensi/sdm`, membedakan loading, empty, error,
+      unauthorized, not found, dan source.
+- [x] Test schema, adapter, service, dan router lulus.
+- [ ] Response live Penugasan belum diuji karena credential dan UAT belum
+      tersedia.
 
 ## 0. Gate kontrak eksternal
 

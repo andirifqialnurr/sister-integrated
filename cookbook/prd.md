@@ -20,7 +20,7 @@ merupakan bagian dari product scope.
 - Sumber batas capability: [SISTER Web Service PT.pdf](../SISTER%20Web%20Service%20PT.pdf).
 - Scope reference: 236 endpoint unik dalam 39 domain; tidak seluruhnya masuk
   release pertama.
-- Module awal read-only: `pegawai`, `referensi`, dan `bkd`, dengan page, API
+- Module awal read-only: `pegawai`, `referensi`, `bkd`, dan `penugasan`, dengan page, API
   procedure, service, schema, widget, dan repository khusus (bila dibutuhkan)
   berada di folder module masing-masing.
 - Internal API: tRPC typed API; upload multipart dan download binary memakai
@@ -194,6 +194,10 @@ Modul BKD read-only juga mencakup laporan akhir dan lima list aktivitas sesuai
 halaman PDF 19-26. UI memuat satu tab aktivitas aktif pada satu waktu dan tidak
 menyediakan mutation.
 
+Modul Penugasan read-only mencakup list dan detail sesuai halaman PDF 209-210.
+List memakai SDM yang dipilih dari referensi dan detail hanya dapat dibuka dari
+ID hasil list atau URL yang tetap dilindungi validasi serta session.
+
 ### 7.2 Release pertama: UI
 
 - login aplikasi atau auth boundary sesuai keputusan;
@@ -327,6 +331,20 @@ Implementasi awal menambahkan procedure `bkd.laporan_akhir`,
 - laporan akhir dan aktivitas memiliki state loading, empty, error, dan source;
 - field tabel mengikuti response PDF tanpa pagination yang tidak terdokumentasi;
 - pergantian tab hanya memuat endpoint aktivitas yang dipilih.
+
+### FR-06a Penugasan
+
+User dapat memilih SDM dan melihat daftar penugasan/penempatan serta detailnya.
+
+Acceptance:
+
+- list memanggil `GET /penugasan` dengan `id_sdm` dari `/referensi/sdm`;
+- detail memanggil `GET /penugasan/{id}` dengan ID yang berasal dari hasil list;
+- field list dan detail hanya mengikuti kontrak PDF halaman 209-210;
+- empty, error, unauthorized, dan not found ditampilkan sebagai state yang
+  berbeda;
+- tidak ada create, edit, delete, pagination, atau status bisnis tambahan di
+  luar kontrak endpoint.
 
 ### FR-06 Reference options
 

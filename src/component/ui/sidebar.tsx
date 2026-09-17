@@ -2,6 +2,7 @@ import Link from "next/link";
 import {
   BarChart3,
   ClipboardCheck,
+  ClipboardList,
   FileText,
   LayoutDashboard,
   Settings2,
@@ -14,7 +15,7 @@ import { cn } from "@/lib/cn";
 
 type NavigationItem = {
   label: string;
-  href: "/" | "/pegawai" | "/referensi" | "/bkd" | "/audit" | "#pengajuan" | "#dokumen";
+  href: "/" | "/pegawai" | "/referensi" | "/bkd" | "/penugasan" | "/audit" | "#pengajuan" | "#dokumen";
   icon: LucideIcon;
 };
 
@@ -23,6 +24,7 @@ const navigationItems: NavigationItem[] = [
   { label: "Pegawai", href: "/pegawai", icon: UsersRound },
   { label: "Referensi", href: "/referensi", icon: ClipboardCheck },
   { label: "BKD", href: "/bkd", icon: BarChart3 },
+  { label: "Penugasan", href: "/penugasan", icon: ClipboardList },
   { label: "Pengajuan", href: "#pengajuan", icon: FileText },
   { label: "Audit security", href: "/audit", icon: ShieldCheck },
 ];

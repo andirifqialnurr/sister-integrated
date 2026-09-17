@@ -24,6 +24,9 @@ evidence auditnya.
 - Data SISTER tidak dimirror sebagai database bisnis lokal.
 - Read-only reference module saat ini mencakup `/referensi/profil_pt` dan
   `/referensi/semester`; keduanya belum dipersist ke database lokal.
+- Read-only assignment module mencakup `/penugasan` dan `/penugasan/{id}`;
+  keduanya tetap membaca source of truth SISTER dan belum dipersist ke database
+  lokal.
 
 ## Cara mengadaptasi dokumen
 
@@ -362,6 +365,45 @@ dari hasil `/referensi/sdm`, sedangkan pilihan semester berasal dari
 `/referensi/semester` dan dikirim sebagai string query sesuai contoh PDF.
 Response kosong adalah empty state, bukan error. Implementasi awal tidak
 menyimpan baris BKD ke Prisma atau cache lokal.
+
+### 3.5 Penugasan dan penempatan
+
+Kontrak berikut berasal dari halaman PDF 209-210 dan menjadi batas modul
+`penugasan` read-only.
+
+`GET /penugasan` menerima query wajib `id_sdm` bertipe UUID dan mengembalikan
+array object dengan 8 field:
+
+| Field | Tipe PDF | Keterangan |
+| --- | --- | --- |
+| id | string | ID penugasan/penempatan |
+| status_kepegawaian | string | Status kepegawaian |
+| ikatan_kerja | string | Ikatan kerja |
+| unit_kerja | string | Nama unit kerja di perguruan tinggi |
+| jenjang_pendidikan | string | Jenjang pendidikan unit kerja |
+| perguruan_tinggi | string | Nama perguruan tinggi |
+| tanggal_mulai | string | TMT penempatan |
+| tanggal_keluar | string | Tanggal keluar jika SDM sudah keluar |
+
+`GET /penugasan/{id}` menerima path `id` bertipe UUID dan mengembalikan object
+detail dengan 8 field list di atas serta field tambahan:
+
+| Field | Tipe PDF | Keterangan |
+| --- | --- | --- |
+| id_sdm | string | ID SDM pemilik data |
+| surat_tugas | string | Nomor surat tugas |
+| tanggal_surat_tugas | string | Tanggal surat tugas |
+| jenis_keluar | string | Keterangan keluar |
+| id_jenis_keluar | string | ID jenis keluar bila ada |
+| id_status_kepegawaian | integer | ID status kepegawaian |
+| id_ikatan_kerja | string | ID ikatan kerja |
+| id_perguruan_tinggi | string | ID perguruan tinggi |
+| id_unit_kerja | string | ID unit kerja |
+
+List dan detail tidak memiliki parameter pagination atau mutation. UI memilih
+SDM dari `/referensi/sdm`, memilih detail dari hasil list, dan menampilkan
+empty/error state secara terpisah. Implementasi awal tidak menyimpan
+penugasan ke Prisma.
 
 ## 4. Inventaris domain SISTER
 

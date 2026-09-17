@@ -119,6 +119,35 @@ export const bkdActivitySchema = z
 
 export const bkdActivityListSchema = z.array(bkdActivitySchema);
 
+export const penugasanSummarySchema = z
+  .object({
+    id: z.string().min(1),
+    status_kepegawaian: z.string(),
+    ikatan_kerja: z.string(),
+    unit_kerja: z.string(),
+    jenjang_pendidikan: z.string(),
+    perguruan_tinggi: z.string(),
+    tanggal_mulai: z.string(),
+    tanggal_keluar: z.string(),
+  })
+  .passthrough();
+
+export const penugasanSummaryListSchema = z.array(penugasanSummarySchema);
+
+export const penugasanDetailSchema = penugasanSummarySchema
+  .extend({
+    id_sdm: z.string(),
+    surat_tugas: z.string(),
+    tanggal_surat_tugas: z.string(),
+    jenis_keluar: z.string(),
+    id_jenis_keluar: z.string(),
+    id_status_kepegawaian: z.number().int(),
+    id_ikatan_kerja: z.string(),
+    id_perguruan_tinggi: z.string(),
+    id_unit_kerja: z.string(),
+  })
+  .passthrough();
+
 export type SdmSummary = z.infer<typeof sdmSummarySchema>;
 export type SdmProfile = z.infer<typeof sdmProfileSchema>;
 export type SdmEmployment = z.infer<typeof sdmEmploymentSchema>;
@@ -126,3 +155,5 @@ export type ProfilPt = z.infer<typeof profilPtSchema>;
 export type Semester = z.infer<typeof semesterSchema>;
 export type BkdLaporanAkhir = z.infer<typeof bkdLaporanAkhirSchema>;
 export type BkdActivity = z.infer<typeof bkdActivitySchema>;
+export type PenugasanSummary = z.infer<typeof penugasanSummarySchema>;
+export type PenugasanDetail = z.infer<typeof penugasanDetailSchema>;
