@@ -425,7 +425,7 @@ library atau tabel sudah dibuat.
       repository, browser, build artifact, atau log.
 - [ ] Implementasikan layout sidebar 224px, topbar, page header, dan responsive
       contract.
-- [ ] Terapkan header 30px yang hanya berisi search global dan profil.
+- [ ] Terapkan header 40px yang hanya berisi search global dan profil.
 - [ ] Terapkan breadcrumb body maksimal 3 level dengan action/filter/search
       halaman rata kanan.
 - [ ] Hapus title/deskripsi visual halaman yang sudah jelas dari breadcrumb.

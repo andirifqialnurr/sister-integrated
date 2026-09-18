@@ -260,7 +260,7 @@ Aturan folder:
 
 Aturan layout project:
 
-- Header aplikasi memakai padding horizontal 30px dan hanya berisi search global
+- Header aplikasi memakai padding horizontal 40px dan hanya berisi search global
   serta profil/user menu di kanan.
 - Breadcrumb tidak berada di header; breadcrumb berada di body halaman pada row
   pertama bersama action/filter/search halaman.

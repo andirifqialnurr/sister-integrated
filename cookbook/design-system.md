@@ -286,9 +286,9 @@ p {
 - Letter spacing selalu `0`; jangan menggunakan ukuran font berbasis viewport.
 - Weight maksimum 600. Bold bukan default.
 - Spacing scale: 4, 8, 12, 16, 24, 32, 48, 64px.
-- Padding horizontal area kerja dan header: 30px pada desktop/tablet. Mobile
+- Padding horizontal area kerja dan header: 40px pada desktop/tablet. Mobile
   boleh turun ke 16px bila viewport tidak cukup, tetapi layout utama project
-  ini memakai `px-[30px]`.
+  ini memakai `px-[40px]`.
 - Angka memakai tabular numerals.
 - Input dan button tinggi 40px; target sentuh mobile minimal 44px.
 
