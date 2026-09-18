@@ -1,10 +1,12 @@
 import { describe, expect, it } from "vitest";
 
-import { profilPtListSchema, semesterListSchema } from "@/server/sister/types";
+import { profilPtListSchema, semesterListSchema, wilayahListSchema } from "@/server/sister/types";
 
 import {
   referensiProfilPtItemSchema,
   referensiSemesterItemSchema,
+  referensiWilayahInputSchema,
+  referensiWilayahItemSchema,
 } from "./referensi_schemas";
 
 const profilPt = {
@@ -49,5 +51,21 @@ describe("SISTER referensi schemas", () => {
     expect(
       referensiSemesterItemSchema.safeParse({ id: 20251, nama: "Ganjil", extra: true }).success,
     ).toBe(false);
+  });
+
+  it("accepts the documented wilayah response and only the four allowed levels", () => {
+    const wilayah = { id: "32", nama: "Jawa Barat", id_induk_wilayah: "ID" };
+
+    expect(wilayahListSchema.safeParse([wilayah]).success).toBe(true);
+    expect(referensiWilayahItemSchema.parse(wilayah)).toEqual(wilayah);
+    expect(
+      referensiWilayahItemSchema.safeParse({ ...wilayah, undocumented: "x" }).success,
+    ).toBe(false);
+
+    for (const level of [0, 1, 2, 3]) {
+      expect(referensiWilayahInputSchema.safeParse({ id_level_wilayah: level }).success).toBe(true);
+    }
+    expect(referensiWilayahInputSchema.safeParse({ id_level_wilayah: 4 }).success).toBe(false);
+    expect(referensiWilayahInputSchema.safeParse({ id_level_wilayah: "1" }).success).toBe(false);
   });
 });

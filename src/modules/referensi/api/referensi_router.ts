@@ -4,7 +4,8 @@ import { z } from "zod";
 import { SisterApiError, SisterContractError } from "@/server/sister/errors";
 import { createTRPCRouter, protectedProcedure } from "@/server/trpc/init";
 
-import { getProfilPt, getSemester } from "./referensi_service";
+import { referensiWilayahInputSchema } from "../schema/referensi_schemas";
+import { getProfilPt, getSemester, getWilayah } from "./referensi_service";
 
 const emptyInputSchema = z.object({});
 
@@ -49,6 +50,13 @@ export const referensiRouter = createTRPCRouter({
   get_semester: protectedProcedure.input(emptyInputSchema).query(async () => {
     try {
       return await getSemester();
+    } catch (error) {
+      return toSafeTrpcError(error);
+    }
+  }),
+  get_wilayah: protectedProcedure.input(referensiWilayahInputSchema).query(async ({ input }) => {
+    try {
+      return await getWilayah(input.id_level_wilayah);
     } catch (error) {
       return toSafeTrpcError(error);
     }

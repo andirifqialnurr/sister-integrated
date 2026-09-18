@@ -1,6 +1,6 @@
 "use client";
 
-import { Building2, CalendarDays, RefreshCw } from "lucide-react";
+import { Building2, CalendarDays, MapPin, RefreshCw } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 
 import { Button } from "@/component/ui/button";
@@ -11,6 +11,7 @@ import { useTRPC } from "@/lib/trpc";
 
 import { ProfilPtWidget } from "../widget/profil_pt_widget";
 import { SemesterTable } from "../widget/semester_table";
+import { WilayahExplorerWidget } from "../widget/wilayah_explorer_widget";
 
 export function ReferensiPage() {
   const trpc = useTRPC();
@@ -106,6 +107,17 @@ export function ReferensiPage() {
             )}
           </div>
         </article>
+      </section>
+
+      <section className="mt-6 min-w-0 rounded-xl border border-[hsl(var(--color-border))] bg-white shadow-[0_1px_2px_hsl(145_20%_20%/0.04)]">
+        <PanelHeader
+          description="GET /referensi/wilayah - id_level_wilayah 0-3, difilter berdasarkan id_induk_wilayah level sebelumnya"
+          icon={<MapPin aria-hidden size={17} />}
+          title="Wilayah (referensi bertingkat)"
+        />
+        <div className="p-5">
+          <WilayahExplorerWidget />
+        </div>
       </section>
     </PageShell>
   );

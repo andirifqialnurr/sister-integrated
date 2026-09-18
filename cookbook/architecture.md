@@ -453,11 +453,17 @@ Read-only reference flow yang sudah diimplementasikan:
 
     `/referensi/profil_pt` -> ReferensiDataSource.getProfilPt()
     `/referensi/semester` -> ReferensiDataSource.getSemester()
+    `/referensi/wilayah` -> ReferensiDataSource.getWilayah(id_level_wilayah)
 
-Kedua path tidak menerima query dari browser, diparse sebagai array sesuai
-kontrak PDF, lalu dipetakan menjadi DTO eksplisit. Fixture dan live adapter
+`profil_pt` dan `semester` tidak menerima query dari browser, diparse sebagai
+array sesuai kontrak PDF, lalu dipetakan menjadi DTO eksplisit. `wilayah`
+adalah referensi bertingkat: browser hanya boleh mengirim `id_level_wilayah`
+(0-3) yang divalidasi sebagai enum, sedangkan hubungan parent/child
+(`id_induk_wilayah`) difilter di widget berdasarkan level yang sudah dipilih
+pengguna, bukan dikirim sebagai query baru ke SISTER karena PDF tidak
+mendokumentasikan parameter parent pada endpoint ini. Fixture dan live adapter
 memiliki interface yang sama. Implementasi awal belum menulis reference cache
-karena kedua response belum dibutuhkan lintas request sebagai persistence; cache
+karena response belum dibutuhkan lintas request sebagai persistence; cache
 portable dapat ditambahkan setelah TTL dan minimisasi data ditetapkan.
 
 Modul BKD mengikuti alur referensi tersebut. UI tidak menerima UUID atau

@@ -6,7 +6,7 @@ vi.mock("@/server/sister/http_client", () => ({
   sisterGet: sisterGetMock,
 }));
 
-import { profilPtListSchema, semesterListSchema } from "@/server/sister/types";
+import { profilPtListSchema, semesterListSchema, wilayahListSchema } from "@/server/sister/types";
 
 import { FixtureReferensiAdapter, SisterReferensiAdapter } from "./referensi_adapter";
 
@@ -25,6 +25,16 @@ describe("FixtureReferensiAdapter", () => {
       { id: 20251, nama: "Semester Fixture Ganjil" },
       { id: 20252, nama: "Semester Fixture Genap" },
     ]);
+  });
+
+  it("returns nested wilayah levels linked by id_induk_wilayah", async () => {
+    const adapter = new FixtureReferensiAdapter();
+
+    const negara = await adapter.getWilayah(0);
+    const provinsi = await adapter.getWilayah(1);
+
+    expect(negara).toEqual([{ id: "ID", nama: "Indonesia (Fixture)", id_induk_wilayah: "" }]);
+    expect(provinsi.every((item) => item.id_induk_wilayah === negara[0]?.id)).toBe(true);
   });
 });
 
@@ -52,5 +62,18 @@ describe("SisterReferensiAdapter", () => {
       }),
     );
     expect(sisterGetMock.mock.calls[1]?.[0]).not.toHaveProperty("query");
+  });
+
+  it("sends id_level_wilayah as the only documented query parameter", async () => {
+    sisterGetMock.mockResolvedValueOnce([]);
+    const adapter = new SisterReferensiAdapter();
+
+    await adapter.getWilayah(2);
+
+    expect(sisterGetMock).toHaveBeenCalledWith({
+      path: "/referensi/wilayah",
+      query: { id_level_wilayah: 2 },
+      schema: wilayahListSchema,
+    });
   });
 });

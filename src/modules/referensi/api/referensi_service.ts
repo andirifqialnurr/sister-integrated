@@ -1,16 +1,19 @@
 import { getSisterConfig } from "@/server/sister/config";
-import type { ProfilPt, Semester } from "@/server/sister/types";
+import type { ProfilPt, Semester, Wilayah } from "@/server/sister/types";
 
 import {
   referensiProfilPtResponseSchema,
   referensiSemesterResponseSchema,
+  referensiWilayahResponseSchema,
   type ReferensiProfilPtResponse,
   type ReferensiSemesterResponse,
+  type ReferensiWilayahResponse,
 } from "../schema/referensi_schemas";
 import {
   FixtureReferensiAdapter,
   SisterReferensiAdapter,
   type ReferensiDataSource,
+  type WilayahLevel,
 } from "./referensi_adapter";
 
 function createReferensiDataSource(): ReferensiDataSource {
@@ -45,6 +48,14 @@ function toSafeSemester(semester: Semester) {
   };
 }
 
+function toSafeWilayah(wilayah: Wilayah) {
+  return {
+    id: wilayah.id,
+    nama: wilayah.nama,
+    id_induk_wilayah: wilayah.id_induk_wilayah,
+  };
+}
+
 export async function getProfilPt(
   dataSource: ReferensiDataSource = createReferensiDataSource(),
 ): Promise<ReferensiProfilPtResponse> {
@@ -66,6 +77,20 @@ export async function getSemester(
 
   return referensiSemesterResponseSchema.parse({
     items: items.map(toSafeSemester),
+    source: config.fixture_mode ? "fixture" : "sister",
+    fetched_at: new Date().toISOString(),
+  });
+}
+
+export async function getWilayah(
+  idLevelWilayah: WilayahLevel,
+  dataSource: ReferensiDataSource = createReferensiDataSource(),
+): Promise<ReferensiWilayahResponse> {
+  const config = getSisterConfig();
+  const items = await dataSource.getWilayah(idLevelWilayah);
+
+  return referensiWilayahResponseSchema.parse({
+    items: items.map(toSafeWilayah),
     source: config.fixture_mode ? "fixture" : "sister",
     fetched_at: new Date().toISOString(),
   });

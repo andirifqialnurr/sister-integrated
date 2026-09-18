@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it } from "vitest";
 
 import { FixtureReferensiAdapter } from "./referensi_adapter";
-import { getProfilPt, getSemester } from "./referensi_service";
+import { getProfilPt, getSemester, getWilayah } from "./referensi_service";
 
 const originalFixtureMode = process.env.SISTER_FIXTURE_MODE;
 
@@ -49,5 +49,17 @@ describe("referensi service", () => {
     ]);
     expect(result.items[0]).not.toHaveProperty("source");
     expect(result.items[0]).not.toHaveProperty("fetched_at");
+  });
+
+  it("returns wilayah items scoped to the requested level with a source marker", async () => {
+    process.env.SISTER_FIXTURE_MODE = "true";
+
+    const result = await getWilayah(1, new FixtureReferensiAdapter());
+
+    expect(result.source).toBe("fixture");
+    expect(result.items).toEqual([
+      { id: "32", nama: "Jawa Barat (Fixture)", id_induk_wilayah: "ID" },
+      { id: "35", nama: "Jawa Timur (Fixture)", id_induk_wilayah: "ID" },
+    ]);
   });
 });

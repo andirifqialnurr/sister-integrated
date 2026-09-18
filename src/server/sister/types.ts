@@ -77,6 +77,16 @@ export const semesterSchema = z
 
 export const semesterListSchema = z.array(semesterSchema);
 
+export const wilayahSchema = z
+  .object({
+    id: z.string(),
+    nama: z.string(),
+    id_induk_wilayah: z.string(),
+  })
+  .passthrough();
+
+export const wilayahListSchema = z.array(wilayahSchema);
+
 export const bkdLaporanAkhirSchema = z
   .object({
     id_reg_ptk: z.string().uuid(),
@@ -246,6 +256,7 @@ export type SdmProfile = z.infer<typeof sdmProfileSchema>;
 export type SdmEmployment = z.infer<typeof sdmEmploymentSchema>;
 export type ProfilPt = z.infer<typeof profilPtSchema>;
 export type Semester = z.infer<typeof semesterSchema>;
+export type Wilayah = z.infer<typeof wilayahSchema>;
 export type BkdLaporanAkhir = z.infer<typeof bkdLaporanAkhirSchema>;
 export type BkdActivity = z.infer<typeof bkdActivitySchema>;
 export type PenugasanSummary = z.infer<typeof penugasanSummarySchema>;

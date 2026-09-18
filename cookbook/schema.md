@@ -22,8 +22,10 @@ evidence auditnya.
 - Local persistence hanya menyimpan user, konfigurasi, cache terbatas, audit,
   operation status, ajuan cache, dan metadata dokumen.
 - Data SISTER tidak dimirror sebagai database bisnis lokal.
-- Read-only reference module saat ini mencakup `/referensi/profil_pt` dan
-  `/referensi/semester`; keduanya belum dipersist ke database lokal.
+- Read-only reference module saat ini mencakup `/referensi/profil_pt`,
+  `/referensi/semester`, dan `/referensi/wilayah` (referensi bertingkat
+  berdasarkan `id_level_wilayah`); ketiganya belum dipersist ke database
+  lokal.
 - Read-only assignment module mencakup `/penugasan` dan `/penugasan/{id}`;
   keduanya tetap membaca source of truth SISTER dan belum dipersist ke database
   lokal.

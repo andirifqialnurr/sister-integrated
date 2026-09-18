@@ -268,6 +268,57 @@ semantic tone, bukan stale cache indicator.
 - [ ] Browser QA light/dark pada breakpoint 1280/1024/390/320 belum
       dilakukan untuk perubahan ini.
 
+## Referensi bertingkat checkpoint: 2026-09-18
+
+Checkpoint ini melengkapi item "GET satu atau lebih referensi bertingkat yang
+dibutuhkan halaman" pada MVP read-only, memakai `GET /referensi/wilayah`
+(PDF halaman 256) sebagai contoh pertama.
+
+- [x] Schema runtime mengikuti query wajib `id_level_wilayah` (enum 0-3
+      sesuai PDF: Negara, Provinsi, Kota/Kabupaten, Kecamatan) dan tiga field
+      response `id`, `nama`, `id_induk_wilayah`.
+- [x] Adapter live memakai path tetap `/referensi/wilayah` dan hanya
+      mengirim query `id_level_wilayah`; tidak ada parameter tambahan yang
+      tidak terdokumentasi.
+- [x] Fixture menyediakan 4 level bertingkat (Negara -> Provinsi ->
+      Kota/Kabupaten -> Kecamatan) yang saling terhubung lewat
+      `id_induk_wilayah` sehingga UI dapat didemonstrasikan tanpa credential.
+- [x] Halaman `/referensi` menambah panel "Wilayah (referensi bertingkat)"
+      dengan 4 `Select` berjenjang; setiap level baru difilter di client
+      berdasarkan `id_induk_wilayah` terhadap level induk yang dipilih,
+      sesuai catatan `architecture.md` ("referensi bertingkat dimuat sesuai
+      parent ID").
+- [x] Test schema, adapter, service, dan router (termasuk penolakan
+      `id_level_wilayah` di luar 0-3) lulus lewat `bunx vitest run`.
+- [x] Endpoint diverifikasi end-to-end pada dev server fixture mode
+      (`GET /api/trpc/referensi.get_wilayah`) untuk level 0 dan 1; hasil
+      level 1 seluruhnya memiliki `id_induk_wilayah` yang cocok dengan `id`
+      level 0.
+- [ ] Response live `/referensi/wilayah` belum diuji karena credential dan
+      UAT belum tersedia.
+- [ ] `/referensi/unit_kerja`, `/referensi/detail_unit_kerja`,
+      `/referensi/mahasiswa_pddikti`, `/referensi/kategori_kegiatan`,
+      `/referensi/kelompok_bidang`, dan `/referensi/media_publikasi` pada
+      tabel `schema.md` 5.4 belum diimplementasikan.
+
+## MVP read-only UX audit checkpoint: 2026-09-18
+
+- [x] Audit source (`grep` untuk `useMutation`, `.mutate(`, dan label tombol
+      Hapus/Edit/Ubah/Simpan/Tambah/Ajukan) menunjukkan tidak ada satu pun
+      `useMutation` atau tombol mutation pada `src/modules/**/widget` dan
+      `src/modules/**/page`; satu-satunya match adalah `created_at` (bukan
+      "create") dan teks bantuan "Ubah kata kunci" pada empty state
+      pencarian, bukan aksi mutation.
+- [x] Audit source menunjukkan setiap route detail
+      (`src/app/pegawai/[id_sdm]`, `.../penugasan/[id_penugasan]`,
+      `.../pendidikan_formal/[id_pendidikan_formal]`,
+      `.../riwayat_pekerjaan/[id_riwayat_pekerjaan]`) membaca ID dari
+      parameter dinamis Next.js App Router (`params`), bukan dari state
+      client-only, sehingga navigasi langsung ke URL dan refresh browser
+      selalu menghasilkan konteks yang sama.
+- [ ] Browser QA manual (refresh sungguhan pada tiap route detail) belum
+      dilakukan; evidence saat ini adalah source-level check.
+
 ## 0. Gate kontrak eksternal
 
 - [ ] Identifikasi perguruan tinggi target dan instance SISTER yang akan dipakai.
@@ -424,10 +475,10 @@ Scope awal yang disarankan:
 - [x] GET /riwayat_pekerjaan dan detailnya.
 - [x] GET /bkd/laporan_akhir_bkd.
 - [x] GET /bkd/pendidikan, /ajar, /tunjang, /pengmas, dan /penelitian.
-- [ ] GET satu atau lebih referensi bertingkat yang dibutuhkan halaman.
+- [x] GET satu atau lebih referensi bertingkat yang dibutuhkan halaman.
 - [ ] Bedakan loading, empty, error, unauthorized, dan stale cache.
-- [ ] Pastikan resource read-only tidak menampilkan tombol mutation.
-- [ ] Tambahkan route URL langsung yang bertahan setelah refresh.
+- [x] Pastikan resource read-only tidak menampilkan tombol mutation.
+- [x] Tambahkan route URL langsung yang bertahan setelah refresh.
 
 MVP read-only harus divalidasi dahulu sebelum menambah write operation.
 
