@@ -8,7 +8,7 @@ import { BarChart3, SlidersHorizontal } from "lucide-react";
 import { Select } from "@/component/ui/select";
 import { State } from "@/component/ui/state";
 import { StatusBadge } from "@/component/ui/status_badge";
-import { cn } from "@/lib/cn";
+import { Tabs } from "@/component/ui/tabs";
 import { useTRPC } from "@/lib/trpc";
 
 import { BkdActivityTable } from "./bkd_activity_table";
@@ -183,44 +183,33 @@ export function BkdWorkspaceWidget() {
                 source={activityQuery.data?.source}
                 title="Aktivitas BKD"
               />
-              <div className="mt-4 flex gap-1 overflow-x-auto pb-1" role="tablist" aria-label="Jenis aktivitas BKD">
-                {activityTabs.map((tab) => (
-                  <button
-                    aria-selected={activeTab === tab.key}
-                    className={cn(
-                      "whitespace-nowrap rounded-lg px-3 py-2 text-xs font-semibold transition-colors",
-                      activeTab === tab.key
-                        ? "bg-[hsl(var(--color-primary-soft))] text-[hsl(var(--color-primary-strong))]"
-                        : "text-[hsl(var(--color-muted))] hover:bg-[hsl(var(--color-canvas))] hover:text-[hsl(var(--color-text))]",
-                    )}
-                    key={tab.key}
-                    onClick={() => setActiveTab(tab.key)}
-                    role="tab"
-                    type="button"
-                  >
-                    {tab.label}
-                  </button>
-                ))}
+            </div>
+            <Tabs
+              ariaLabel="Jenis aktivitas BKD"
+              className="px-5 pt-3"
+              items={activityTabs.map((tab) => ({ value: tab.key, label: tab.label }))}
+              onValueChange={(value) => setActiveTab(value as ActivityKey)}
+              value={activeTab}
+            >
+              <div className="py-5">
+                {activityQuery.isPending && (
+                  <State
+                    description="Mohon tunggu sebentar."
+                    title={`Memuat data ${activeTab}...`}
+                    tone="loading"
+                  />
+                )}
+                {activityQuery.isError && (
+                  <State title="Aktivitas BKD belum dapat dimuat" tone="error" />
+                )}
+                {activityQuery.data && activityQuery.data.items.length === 0 && (
+                  <State description="Belum ada aktivitas pada semester ini." title="Belum ada aktivitas" />
+                )}
+                {activityQuery.data && activityQuery.data.items.length > 0 && (
+                  <BkdActivityTable items={activityQuery.data.items} />
+                )}
               </div>
-            </div>
-            <div className="p-5">
-              {activityQuery.isPending && (
-                <State
-                  description="Mohon tunggu sebentar."
-                  title={`Memuat data ${activeTab}...`}
-                  tone="loading"
-                />
-              )}
-              {activityQuery.isError && (
-                <State title="Aktivitas BKD belum dapat dimuat" tone="error" />
-              )}
-              {activityQuery.data && activityQuery.data.items.length === 0 && (
-                <State description="Belum ada aktivitas pada semester ini." title="Belum ada aktivitas" />
-              )}
-              {activityQuery.data && activityQuery.data.items.length > 0 && (
-                <BkdActivityTable items={activityQuery.data.items} />
-              )}
-            </div>
+            </Tabs>
           </section>
         </>
       )}
