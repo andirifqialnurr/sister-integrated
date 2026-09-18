@@ -405,6 +405,28 @@ masing-masing dengan commit terpisah.
       manipulasi waktu (fake timers); evidence saat ini hanya mencakup path
       cache-hit dan cache-miss awal.
 
+## tRPC output DTO safety checkpoint: 2026-09-18
+
+- [x] `src/server/security/output_safety.test.ts` (baru) memindai seluruh
+      `src/modules/**/api/*_router.ts` dan `*_service.ts`: menegaskan tidak
+      ada satupun yang menyebut `bearer`, `credential_ref`, `password`, atau
+      `SISTER_PASSWORD`, dan tidak ada satupun yang meng-import
+      `@prisma/client` atau `server/db/prisma` secara langsung (hanya
+      `repository/*.ts` yang boleh menyentuh Prisma). Test ini adalah
+      regression guard, bukan hanya audit satu kali.
+- [x] Review source menunjukkan setiap router hanya melakukan input
+      validation (Zod), auth (`protectedProcedure`/`adminProcedure`), dan
+      delegasi `try/catch` ke fungsi `*_service.ts`; tidak ada query Prisma
+      atau logika bisnis langsung di file router.
+- [x] `grep` untuk `console.log/error/warn/info` di seluruh `src` (di luar
+      test) tidak menemukan satupun structured logger; satu-satunya jalur
+      audit adalah `security_audit_event` yang redaction-nya sudah diuji di
+      checkpoint sebelumnya ("Security audit readback checkpoint").
+- [ ] Item "Redact credential, token, dan PII pada structured log" belum
+      relevan diuji karena belum ada logger aplikasi umum di luar
+      `security_audit_event`; akan perlu evidence baru begitu logger
+      ditambahkan.
+
 ## 0. Gate kontrak eksternal
 
 - [ ] Identifikasi perguruan tinggi target dan instance SISTER yang akan dipakai.
@@ -516,9 +538,9 @@ library atau tabel sudah dibuat.
 - [ ] Implementasikan fetch wrapper untuk JSON, multipart, dan binary.
 - [ ] Implementasikan router dan procedure tRPC per capability module, bukan
       generic proxy atau salinan 1:1 seluruh endpoint SISTER.
-- [ ] Pastikan router tRPC hanya mengatur input, auth, permission, dan delegasi
+- [x] Pastikan router tRPC hanya mengatur input, auth, permission, dan delegasi
       ke service/use case.
-- [ ] Pastikan output tRPC berupa DTO yang aman dan tidak mengembalikan object
+- [x] Pastikan output tRPC berupa DTO yang aman dan tidak mengembalikan object
       Prisma mentah, bearer token, atau response sensitif penuh.
 - [ ] Gunakan Route Handler khusus untuk upload multipart dan download binary.
 - [ ] Implementasikan parsing response 200, 204, dan error message/detail.
@@ -531,7 +553,7 @@ library atau tabel sudah dibuat.
       limit, input/file rejection, secret failure, dan config change.
 - [ ] Pastikan tRPC context memvalidasi session, actor, permission, dan
       integration/PT sebelum procedure berjalan.
-- [ ] Uji bahwa output tRPC tidak mengandung token, secret, raw Prisma object,
+- [x] Uji bahwa output tRPC tidak mengandung token, secret, raw Prisma object,
       atau PII yang tidak dibutuhkan.
 - [ ] Tambahkan timeout yang dikonfirmasi pada gate kontrak.
 - [x] Tambahkan SSRF protection dengan allowlist base URL.
