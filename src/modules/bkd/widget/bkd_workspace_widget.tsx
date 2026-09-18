@@ -5,6 +5,7 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { BarChart3, SlidersHorizontal } from "lucide-react";
 
+import { Select } from "@/component/ui/select";
 import { StatusBadge } from "@/component/ui/status_badge";
 import { cn } from "@/lib/cn";
 import { useTRPC } from "@/lib/trpc";
@@ -95,83 +96,58 @@ export function BkdWorkspaceWidget() {
 
   return (
     <section className="space-y-6">
-      <div className="rounded-xl border border-[hsl(var(--color-border))] bg-white p-5 shadow-[0_1px_2px_hsl(145_20%_20%/0.04)]">
-        <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-start">
-          <div>
-            <div className="flex items-center gap-2">
-              <h2 className="text-sm font-bold text-[hsl(var(--color-text))]">Pilih konteks BKD</h2>
-              {pegawaiQuery.data?.source && <SourceBadge source={pegawaiQuery.data.source} />}
-            </div>
-            <p className="mt-1 text-xs leading-5 text-[hsl(var(--color-muted))]">
-              SDM dan semester dipilih dari referensi SISTER. Tidak ada input UUID atau semester arbitrary.
-            </p>
-          </div>
-          <div className="flex items-center gap-1.5 text-xs text-[hsl(var(--color-muted))]">
-            <SlidersHorizontal aria-hidden size={14} />
-            Read-only
-          </div>
-        </div>
-
-        <div className="mt-5 grid gap-4 md:grid-cols-2">
-          <label className="block text-xs font-semibold text-[hsl(var(--color-text))]" htmlFor="bkd-sdm">
-            Pegawai / SDM
-            <select
-              className="mt-2 h-10 w-full rounded-lg border border-[hsl(var(--color-border))] bg-white px-3 text-sm font-normal text-[hsl(var(--color-text))] outline-none transition-colors focus:border-[hsl(var(--color-primary))] focus:ring-2 focus:ring-[hsl(var(--color-primary-soft))] disabled:cursor-not-allowed disabled:bg-[hsl(var(--color-canvas))]"
-              disabled={pegawaiQuery.isPending || pegawaiQuery.isError}
-              id="bkd-sdm"
-              onChange={(event) => setSelectedSdmId(event.target.value)}
-              value={selectedSdmId}
-            >
-              <option value="">Pilih pegawai</option>
-              {pegawaiQuery.data?.items.map((item) => (
-                <option key={item.id_sdm} value={item.id_sdm}>
-                  {item.nama_sdm} {item.nidn ? `· ${item.nidn}` : ""}
-                </option>
-              ))}
-            </select>
-          </label>
-
-          <label className="block text-xs font-semibold text-[hsl(var(--color-text))]" htmlFor="bkd-semester">
-            Semester
-            <select
-              className="mt-2 h-10 w-full rounded-lg border border-[hsl(var(--color-border))] bg-white px-3 text-sm font-normal text-[hsl(var(--color-text))] outline-none transition-colors focus:border-[hsl(var(--color-primary))] focus:ring-2 focus:ring-[hsl(var(--color-primary-soft))] disabled:cursor-not-allowed disabled:bg-[hsl(var(--color-canvas))]"
-              disabled={semesterQuery.isPending || semesterQuery.isError}
-              id="bkd-semester"
-              onChange={(event) => setSelectedSemesterId(event.target.value)}
-              value={selectedSemesterId}
-            >
-              <option value="">Pilih semester</option>
-              {semesterQuery.data?.items.map((item) => (
-                <option key={item.id} value={item.id}>
-                  {item.nama} ({item.id})
-                </option>
-              ))}
-            </select>
-          </label>
-        </div>
-
+      <div className="flex flex-col items-stretch gap-3 md:flex-row md:items-center md:justify-end">
+        {pegawaiQuery.data?.source && <SourceBadge source={pegawaiQuery.data.source} />}
+        <Select
+          ariaLabel="Pilih pegawai untuk BKD"
+          disabled={pegawaiQuery.isPending || pegawaiQuery.isError}
+          onValueChange={setSelectedSdmId}
+          options={[
+            { label: "Pilih pegawai", value: "" },
+            ...(pegawaiQuery.data?.items.map((item) => ({
+              label: `${item.nama_sdm}${item.nidn ? ` - ${item.nidn}` : ""}`,
+              value: item.id_sdm,
+            })) ?? []),
+          ]}
+          value={selectedSdmId}
+        />
+        <Select
+          ariaLabel="Pilih semester"
+          disabled={semesterQuery.isPending || semesterQuery.isError}
+          onValueChange={setSelectedSemesterId}
+          options={[
+            { label: "Pilih semester", value: "" },
+            ...(semesterQuery.data?.items.map((item) => ({
+              label: `${item.nama} (${item.id})`,
+              value: String(item.id),
+            })) ?? []),
+          ]}
+          value={selectedSemesterId}
+        />
         {(pegawaiQuery.isPending || semesterQuery.isPending) && (
-          <p className="mt-4 text-xs text-[hsl(var(--color-muted))]">Memuat pilihan referensi...</p>
-        )}
-        {(pegawaiQuery.isError || semesterQuery.isError) && (
-          <div className="mt-4 rounded-lg border border-[hsl(var(--color-danger))]/30 bg-[hsl(var(--color-danger-soft))] p-4 text-sm text-[hsl(var(--color-danger-strong))]">
-            Pilihan SDM atau semester belum dapat dimuat. Periksa session dan koneksi SISTER.
-          </div>
+          <p className="text-xs text-[hsl(var(--color-muted))]">Memuat pilihan...</p>
         )}
         {selectedPegawai && selectedSemesterId && (
-          <p className="mt-4 text-xs text-[hsl(var(--color-muted))]">
-            Konteks aktif: <span className="font-semibold text-[hsl(var(--color-text))]">{selectedPegawai.nama_sdm}</span> · semester {selectedSemesterId}
+          <p className="text-xs text-[hsl(var(--color-muted))]">
+            Konteks aktif:{" "}
+            <span className="font-semibold text-[hsl(var(--color-text))]">
+              {selectedPegawai.nama_sdm}
+            </span>{" "}
+            - semester {selectedSemesterId}
           </p>
         )}
       </div>
 
+      {(pegawaiQuery.isError || semesterQuery.isError) && (
+        <ErrorState label="Pilihan SDM atau semester belum dapat dimuat. Periksa session dan koneksi SISTER." />
+      )}
       {!hasSelection && <SelectionState />}
 
       {hasSelection && (
         <>
           <section className="space-y-4">
             <PanelHeading
-              description="GET /bkd/laporan_akhir_bkd · berdasarkan id_sdm"
+              description="GET /bkd/laporan_akhir_bkd - berdasarkan id_sdm"
               source={laporanQuery.data?.source}
               title="Laporan akhir BKD"
             />
@@ -188,7 +164,7 @@ export function BkdWorkspaceWidget() {
           <section className="overflow-hidden rounded-xl border border-[hsl(var(--color-border))] bg-white shadow-[0_1px_2px_hsl(145_20%_20%/0.04)]">
             <div className="border-b border-[hsl(var(--color-border))] p-5">
               <PanelHeading
-                description={`GET /bkd/${activeTab} · id_sdm + id_smt`}
+                description={`GET /bkd/${activeTab} - id_sdm + id_smt`}
                 source={activityQuery.data?.source}
                 title="Aktivitas BKD"
               />
@@ -281,7 +257,11 @@ function SelectionState() {
 }
 
 function LoadingState({ label }: { label: string }) {
-  return <div className="rounded-xl border border-[hsl(var(--color-border))] bg-white p-10 text-center text-sm text-[hsl(var(--color-muted))]">{label}</div>;
+  return (
+    <div className="rounded-xl border border-[hsl(var(--color-border))] bg-white p-10 text-center text-sm text-[hsl(var(--color-muted))]">
+      {label}
+    </div>
+  );
 }
 
 function ErrorState({ label }: { label: string }) {

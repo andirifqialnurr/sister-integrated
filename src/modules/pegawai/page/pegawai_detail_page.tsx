@@ -1,12 +1,10 @@
 "use client";
 
-import Link from "next/link";
-
-import { ArrowLeft, BriefcaseBusiness, CircleAlert, UserRound } from "lucide-react";
+import { BriefcaseBusiness, CircleAlert, UserRound } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 
+import { PageShell } from "@/component/ui/page_shell";
 import { StatusBadge } from "@/component/ui/status_badge";
-import { Sidebar } from "@/component/ui/sidebar";
 import { useTRPC } from "@/lib/trpc";
 
 type PegawaiDetailPageProps = {
@@ -27,21 +25,13 @@ export function PegawaiDetailPage({ idSdm }: PegawaiDetailPageProps) {
   const detailQuery = useQuery(trpc.pegawai.get_detail.queryOptions({ id_sdm: idSdm }));
 
   return (
-    <div className="flex min-h-screen">
-      <Sidebar activeLabel="Pegawai" />
-      <div className="min-w-0 flex-1">
-        <header className="flex h-16 items-center justify-between border-b border-[hsl(var(--color-border))] bg-white px-5 sm:px-8">
-          <Link
-            className="inline-flex items-center gap-2 text-xs font-semibold text-[hsl(var(--color-muted))] transition-colors hover:text-[hsl(var(--color-primary))]"
-            href="/pegawai"
-          >
-            <ArrowLeft aria-hidden size={15} />
-            Kembali ke daftar pegawai
-          </Link>
-          <StatusBadge tone="neutral">Read-only</StatusBadge>
-        </header>
-
-        <main className="mx-auto max-w-[1100px] space-y-6 p-5 sm:p-8">
+    <PageShell
+      actions={<StatusBadge tone="neutral">Read-only</StatusBadge>}
+      activeLabel="Pegawai"
+      breadcrumb={[{ href: "/", label: "Ikhtisar" }, { href: "/pegawai", label: "Pegawai" }]}
+      detailLabel={detailQuery.data?.summary.nama_sdm ?? "pegawai"}
+      maxWidth="1100px"
+    >
           {detailQuery.isPending && (
             <div className="rounded-xl border border-[hsl(var(--color-border))] bg-white p-10 text-center text-sm text-[hsl(var(--color-muted))]">
               Memuat detail pegawai...
@@ -137,8 +127,6 @@ export function PegawaiDetailPage({ idSdm }: PegawaiDetailPageProps) {
               </div>
             </>
           )}
-        </main>
-      </div>
-    </div>
+    </PageShell>
   );
 }

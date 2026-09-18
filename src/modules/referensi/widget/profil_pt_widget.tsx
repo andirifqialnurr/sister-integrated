@@ -10,10 +10,7 @@ export function ProfilPtWidget({ items }: ProfilPtWidgetProps) {
   return (
     <div className="grid gap-4 xl:grid-cols-2">
       {items.map((profile) => (
-        <article
-          className="rounded-xl border border-[hsl(var(--color-border))] bg-white p-5 shadow-[0_1px_2px_hsl(145_20%_20%/0.04)]"
-          key={profile.id}
-        >
+        <article className="min-w-0" key={profile.id}>
           <div className="flex items-start justify-between gap-4">
             <div>
               <p className="text-sm font-bold text-[hsl(var(--color-text))]">

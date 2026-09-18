@@ -1,11 +1,8 @@
 "use client";
 
-import Link from "next/link";
-
-import { ArrowLeft } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 
-import { Sidebar } from "@/component/ui/sidebar";
+import { PageShell } from "@/component/ui/page_shell";
 import { StatusBadge } from "@/component/ui/status_badge";
 import { useTRPC } from "@/lib/trpc";
 
@@ -26,21 +23,25 @@ export function RiwayatPekerjaanDetailPage({
   );
 
   return (
-    <div className="flex min-h-screen">
-      <Sidebar activeLabel="Riwayat Pekerjaan" />
-      <div className="min-w-0 flex-1">
-        <header className="flex h-16 items-center justify-between border-b border-[hsl(var(--color-border))] bg-white px-5 sm:px-8">
-          <Link
-            className="inline-flex items-center gap-2 text-xs font-semibold text-[hsl(var(--color-muted))] transition-colors hover:text-[hsl(var(--color-primary))]"
-            href="/riwayat_pekerjaan"
-          >
-            <ArrowLeft aria-hidden size={15} />
-            Kembali ke riwayat pekerjaan
-          </Link>
+    <PageShell
+      actions={
+        <>
+          {detailQuery.data?.source && (
+            <StatusBadge tone={detailQuery.data.source === "sister" ? "success" : "warning"}>
+              {detailQuery.data.source === "sister" ? "SISTER" : "Fixture mode"}
+            </StatusBadge>
+          )}
           <StatusBadge tone="neutral">Read-only</StatusBadge>
-        </header>
-
-        <main className="mx-auto max-w-[1100px] space-y-6 p-5 sm:p-8">
+        </>
+      }
+      activeLabel="Riwayat Pekerjaan"
+      breadcrumb={[
+        { href: "/", label: "Ikhtisar" },
+        { href: "/riwayat_pekerjaan", label: "Riwayat Pekerjaan" },
+      ]}
+      detailLabel={detailQuery.data?.item.nama_jabatan ?? "riwayat pekerjaan"}
+      maxWidth="1100px"
+    >
           {detailQuery.isPending && (
             <div className="rounded-xl border border-[hsl(var(--color-border))] bg-white p-10 text-center text-sm text-[hsl(var(--color-muted))]">
               Memuat detail riwayat pekerjaan...
@@ -55,17 +56,8 @@ export function RiwayatPekerjaanDetailPage({
           )}
 
           {detailQuery.data && (
-            <>
-              <div className="flex justify-end">
-                <StatusBadge tone={detailQuery.data.source === "sister" ? "success" : "warning"}>
-                  {detailQuery.data.source === "sister" ? "SISTER" : "Fixture mode"}
-                </StatusBadge>
-              </div>
-              <RiwayatPekerjaanDetailWidget item={detailQuery.data.item} />
-            </>
+            <RiwayatPekerjaanDetailWidget item={detailQuery.data.item} />
           )}
-        </main>
-      </div>
-    </div>
+    </PageShell>
   );
 }

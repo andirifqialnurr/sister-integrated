@@ -1,53 +1,14 @@
-import Link from "next/link";
-
-import { ArrowLeft, UsersRound } from "lucide-react";
-
-import { Sidebar } from "@/component/ui/sidebar";
+import { PageShell } from "@/component/ui/page_shell";
 
 import { PegawaiSearchWidget } from "../widget/pegawai_search_widget";
 
 export function PegawaiPage() {
   return (
-    <div className="flex min-h-screen">
-      <Sidebar activeLabel="Pegawai" />
-      <div className="min-w-0 flex-1">
-        <header className="flex h-16 items-center justify-between border-b border-[hsl(var(--color-border))] bg-white px-5 sm:px-8">
-          <Link
-            className="inline-flex items-center gap-2 text-xs font-semibold text-[hsl(var(--color-muted))] transition-colors hover:text-[hsl(var(--color-primary))]"
-            href="/"
-          >
-            <ArrowLeft aria-hidden size={15} />
-            Kembali ke ikhtisar
-          </Link>
-          <span className="text-xs font-medium text-[hsl(var(--color-muted))]">
-            SISTER Console / Pegawai
-          </span>
-        </header>
-
-        <main className="mx-auto max-w-[1440px] space-y-6 p-5 sm:p-8">
-          <section>
-            <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[hsl(var(--color-primary-soft))] text-[hsl(var(--color-primary))]">
-                <UsersRound aria-hidden size={20} />
-              </div>
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[hsl(var(--color-primary))]">
-                  Modul read-only
-                </p>
-                <h1 className="mt-1 text-2xl font-bold tracking-tight text-[hsl(var(--color-text))]">
-                  Pegawai
-                </h1>
-              </div>
-            </div>
-            <p className="mt-4 max-w-2xl text-sm leading-6 text-[hsl(var(--color-muted))]">
-              Cari dan buka ringkasan data SDM dari kontrak `/referensi/sdm`.
-              Detail profil dan kepegawaian mengikuti endpoint data pokok SISTER.
-            </p>
-          </section>
-
-          <PegawaiSearchWidget />
-        </main>
-      </div>
-    </div>
+    <PageShell
+      activeLabel="Pegawai"
+      breadcrumb={[{ href: "/", label: "Ikhtisar" }, { label: "Pegawai" }]}
+    >
+      <PegawaiSearchWidget />
+    </PageShell>
   );
 }

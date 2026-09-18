@@ -3,9 +3,10 @@
 import { useState, type FormEvent } from "react";
 
 import { useQuery } from "@tanstack/react-query";
-import { Search, SlidersHorizontal } from "lucide-react";
+import { Search } from "lucide-react";
 
 import { Button } from "@/component/ui/button";
+import { Select } from "@/component/ui/select";
 import { StatusBadge } from "@/component/ui/status_badge";
 import { useTRPC } from "@/lib/trpc";
 
@@ -45,45 +46,18 @@ export function PegawaiSearchWidget() {
 
   return (
     <section className="space-y-4">
-      <div className="rounded-xl border border-[hsl(var(--color-border))] bg-white p-5 shadow-[0_1px_2px_hsl(145_20%_20%/0.04)]">
-        <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-start">
-          <div>
-            <div className="flex items-center gap-2">
-              <h2 className="text-sm font-bold text-[hsl(var(--color-text))]">Cari pegawai</h2>
-              <StatusBadge tone={pegawaiQuery.data?.source === "sister" ? "success" : "warning"}>
-                {pegawaiQuery.data?.source === "sister" ? "SISTER" : "Fixture mode"}
-              </StatusBadge>
-            </div>
-            <p className="mt-1 text-xs leading-5 text-[hsl(var(--color-muted))]">
-              Sumber data akan berpindah ke SISTER setelah environment UAT
-              dikonfigurasi.
-            </p>
-          </div>
-          <div className="flex items-center gap-1.5 text-xs text-[hsl(var(--color-muted))]">
-            <SlidersHorizontal aria-hidden size={14} />
-            Read-only
-          </div>
-        </div>
-
-        <form className="mt-5 flex flex-col gap-3 md:flex-row" onSubmit={submitSearch}>
-          <label className="sr-only" htmlFor="pegawai-search-by">
-            Cari berdasarkan
-          </label>
-          <select
-            className="h-10 rounded-lg border border-[hsl(var(--color-border))] bg-white px-3 text-sm text-[hsl(var(--color-text))] outline-none transition-colors focus:border-[hsl(var(--color-primary))] focus:ring-2 focus:ring-[hsl(var(--color-primary-soft))] md:w-44"
-            id="pegawai-search-by"
-            onChange={(event) =>
-              setSearchBy(event.target.value as PegawaiSearchInput["search_by"])
-            }
+      <div className="flex flex-col items-stretch gap-3 md:flex-row md:items-center md:justify-end">
+        <StatusBadge tone={pegawaiQuery.data?.source === "sister" ? "success" : "warning"}>
+          {pegawaiQuery.data?.source === "sister" ? "SISTER" : "Fixture mode"}
+        </StatusBadge>
+        <form className="flex flex-col gap-3 md:flex-row md:justify-end" onSubmit={submitSearch}>
+          <Select
+            ariaLabel="Cari berdasarkan"
+            onValueChange={(value) => setSearchBy(value as PegawaiSearchInput["search_by"])}
+            options={[...searchOptions]}
             value={searchBy}
-          >
-            {searchOptions.map((option) => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </select>
-          <label className="relative block min-w-0 flex-1" htmlFor="pegawai-search">
+          />
+          <label className="relative block min-w-0 md:w-[280px]" htmlFor="pegawai-search">
             <Search
               aria-hidden
               className="absolute left-3 top-1/2 -translate-y-1/2 text-[hsl(var(--color-muted))]"

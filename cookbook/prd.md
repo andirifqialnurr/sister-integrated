@@ -164,6 +164,15 @@ Requirement teknis berikut berlaku untuk project `sister-integrated`:
   `component/widget/` atau `<module>/widget/`;
 - warna, font, dan chart palette diambil dari `const/theme.ts`;
 - chart yang dipakai harus menggunakan `ReportChart` berbasis ApexCharts.
+- header memakai margin/padding horizontal 30px dan hanya berisi search global
+  serta profil;
+- breadcrumb berada di body halaman, maksimal 3 level, dan action/filter/search
+  halaman rata kanan sejajar breadcrumb;
+- halaman tidak menampilkan title/deskripsi visual jika sudah jelas dari
+  breadcrumb;
+- filter dropdown dan date picker memakai komponen custom bertema hijau, bukan
+  kontrol default browser;
+- card tidak boleh bersarang; form filter tidak dibungkus card.
 
 Konvensi ini adalah implementation profile, bukan requirement bisnis. Jika
 project lain sudah memiliki framework atau API boundary berbeda, adaptasikan

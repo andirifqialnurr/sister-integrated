@@ -286,7 +286,9 @@ p {
 - Letter spacing selalu `0`; jangan menggunakan ukuran font berbasis viewport.
 - Weight maksimum 600. Bold bukan default.
 - Spacing scale: 4, 8, 12, 16, 24, 32, 48, 64px.
-- Padding area kerja: 32px desktop, 24px tablet, 16px mobile.
+- Padding horizontal area kerja dan header: 30px pada desktop/tablet. Mobile
+  boleh turun ke 16px bila viewport tidak cukup, tetapi layout utama project
+  ini memakai `px-[30px]`.
 - Angka memakai tabular numerals.
 - Input dan button tinggi 40px; target sentuh mobile minimal 44px.
 
@@ -301,6 +303,9 @@ p {
 
 Shadow hanya dipakai untuk dialog dan popover. Jangan menambahkan radius
 asimetris, shadow pada setiap section, atau hover yang menggeser layout.
+Jangan membuat card di dalam card. Card boleh dipakai untuk satu unit informasi,
+table shell, dialog, repeated item, atau state penting; form filter, search,
+dan toolbar tidak boleh dibungkus card.
 
 ## Layout Shell
 
@@ -310,20 +315,26 @@ app-shell: 224px sidebar | minmax(0, 1fr) content
 content: mobile-topbar? -> topbar -> page-content
 
 Page content
-page-header: breadcrumb kiri | page-actions kanan
+breadcrumb-row: breadcrumb kiri | page-actions kanan
 section: heading/toolbar -> content -> pagination
 ```
 
 - Sidebar desktop lebar 224px, sticky, dan tinggi viewport.
 - Header grup sidebar tetap tampil. Gunakan grup yang relevan dengan aplikasi baru.
-- Topbar hanya berisi identitas, theme toggle, dan aksi akun. Jangan menaruh
-  breadcrumb atau judul halaman di topbar.
-- Page header memiliki satu breadcrumb dan satu grup aksi.
+- Topbar/header aplikasi hanya berisi search global dan profil/user menu di
+  ujung kanan. Jangan menaruh breadcrumb, judul halaman, deskripsi halaman,
+  status modul, atau tombol kembali di header.
+- Breadcrumb selalu berada di area halaman, bukan di header.
+- Breadcrumb row memiliki satu breadcrumb di kiri dan satu grup aksi/filter di
+  kanan.
 - Page content memiliki `max-width: 1680px`, `margin: 0 auto`, dan `min-width: 0`
   pada setiap child langsung agar tabel tidak memaksa halaman melebar.
 - Section data tidak dibungkus card tambahan.
+- Halaman tidak menampilkan title dan deskripsi visual terpisah bila nama
+  halaman sudah jelas dari breadcrumb. Jika tetap perlu heading aksesibel,
+  render sebagai `sr-only`.
 - Aksi per baris dan pagination tetap dekat dengan tabel, bukan dipindah ke
-  page header.
+  breadcrumb row.
 
 ### Breadcrumb Dan Page Actions
 
@@ -345,8 +356,15 @@ type PageHeaderProps = {
 Aturan:
 
 - Parent breadcrumb berupa link; item aktif memakai `aria-current="page"`.
+- Breadcrumb maksimal 3 level termasuk icon awal.
+- Format halaman list: `[icon_kotak-kotak] > [nama_menu] > [nama_submenu]`.
+- Format halaman detail/proses: `[icon_kotak-kotak] > [dot_3_di_tengah] >
+  Detail [nama_data_dari_detail]`. Pola ini juga dipakai untuk halaman tambah,
+  ubah, review, atau proses lain.
 - Nama aktif memakai ellipsis dan `title`, bukan mendorong toolbar keluar layar.
-- Filter, search, dan aksi berada di kanan breadcrumb dalam satu flex group.
+- Filter dropdown, date picker, search per halaman, dan button aksi halaman
+  berada di kanan breadcrumb dalam satu flex group. Jangan meletakkannya di
+  bawah konten atau membungkusnya dalam card.
 - Gap antar kontrol 8px.
 - Select toolbar lebar 152px; search toolbar lebar 180px.
 - Pada mobile breadcrumb berada di baris pertama; aksi boleh wrap ke baris berikutnya.
@@ -403,6 +421,18 @@ Select wajib custom. Jangan memakai popup default browser untuk filter atau form
   tidak tertutup top layer.
 - Label form tetap disediakan; label yang tidak perlu terlihat boleh memakai
   `sr-only`.
+
+### `DatePicker`
+
+Date picker wajib custom sesuai token tema. Jangan memakai tampilan default
+browser sebagai UI final.
+
+- Format nilai mengikuti kontrak external API, misalnya `yyyy-mm-dd`.
+- Kontrol tanggal yang berada di toolbar tetap sejajar di kanan breadcrumb.
+- Trigger/input tinggi 40px, radius 6px, dan focus ring sama dengan input lain.
+- Sediakan label aksesibel, empty state, disabled state, dan validasi format.
+- Calendar popover memakai border, background popover, radius 6px, padding 4px,
+  dan shadow ringan.
 
 ### Widget `DataTable`
 

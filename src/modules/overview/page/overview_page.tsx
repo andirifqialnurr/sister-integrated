@@ -6,7 +6,7 @@ import {
   UsersRound,
 } from "lucide-react";
 
-import { Sidebar } from "@/component/ui/sidebar";
+import { PageShell } from "@/component/ui/page_shell";
 import { StatusBadge } from "@/component/ui/status_badge";
 import { EmptyActivity } from "@/component/widget/empty_activity";
 import { StatCard } from "@/component/widget/stat_card";
@@ -15,55 +15,21 @@ import { OverviewStatusWidget } from "../widget/overview_status_widget";
 
 export function OverviewPage() {
   return (
-    <div className="flex min-h-screen">
-      <Sidebar />
-
-      <div className="min-w-0 flex-1">
-        <header className="flex h-16 items-center justify-between border-b border-[hsl(var(--color-border))] bg-white px-5 sm:px-8">
-          <div className="flex items-center gap-3 lg:hidden">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[hsl(var(--color-primary))] text-sm font-black text-white">
-              S
-            </div>
-            <span className="text-sm font-bold text-[hsl(var(--color-text))]">
-              SISTER Console
-            </span>
-          </div>
-          <div className="hidden text-xs font-medium text-[hsl(var(--color-muted))] sm:block">
-            Integration workspace / Ikhtisar
-          </div>
-          <div className="flex items-center gap-3">
-            <StatusBadge>Development</StatusBadge>
-            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[hsl(var(--color-primary-soft))] text-xs font-bold text-[hsl(var(--color-primary-strong))]">
-              AD
-            </div>
-          </div>
-        </header>
-
-        <main className="mx-auto max-w-[1440px] space-y-6 p-5 sm:p-8">
-          <section className="flex flex-col justify-between gap-4 md:flex-row md:items-end">
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[hsl(var(--color-primary))]">
-                SISTER Web Service PT
-              </p>
-              <h1 className="mt-2 text-2xl font-bold tracking-tight text-[hsl(var(--color-text))] sm:text-3xl">
-                Selamat datang di workspace integrasi
-              </h1>
-              <p className="mt-2 max-w-2xl text-sm leading-6 text-[hsl(var(--color-muted))]">
-                Foundation aplikasi sudah siap. Hubungkan environment SISTER
-                setelah credential dan PT tujuan dikonfirmasi.
-              </p>
-            </div>
-            <div className="flex gap-2">
-              <button className="inline-flex h-9 items-center gap-2 rounded-lg border border-[hsl(var(--color-border))] bg-white px-3.5 text-sm font-semibold text-[hsl(var(--color-text))] transition-colors hover:bg-[hsl(var(--color-primary-soft))]">
-                <RefreshCw aria-hidden size={15} />
-                Sinkronisasi
-              </button>
-              <button className="inline-flex h-9 items-center gap-2 rounded-lg bg-[hsl(var(--color-primary))] px-3.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-[hsl(var(--color-primary-strong))]">
-                <ArrowDownToLine aria-hidden size={15} />
-                Konfigurasi
-              </button>
-            </div>
-          </section>
+    <PageShell
+      actions={
+        <>
+          <button className="inline-flex h-9 items-center gap-2 rounded-lg border border-[hsl(var(--color-border))] bg-white px-3.5 text-sm font-semibold text-[hsl(var(--color-text))] transition-colors hover:bg-[hsl(var(--color-primary-soft))]">
+            <RefreshCw aria-hidden size={15} />
+            Sinkronisasi
+          </button>
+          <button className="inline-flex h-9 items-center gap-2 rounded-lg bg-[hsl(var(--color-primary))] px-3.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-[hsl(var(--color-primary-strong))]">
+            <ArrowDownToLine aria-hidden size={15} />
+            Konfigurasi
+          </button>
+        </>
+      }
+      breadcrumb={[{ label: "Ikhtisar" }]}
+    >
 
           <section className="grid gap-4 md:grid-cols-3">
             <StatCard
@@ -124,9 +90,7 @@ export function OverviewPage() {
               </div>
             </div>
           </section>
-        </main>
-      </div>
-    </div>
+    </PageShell>
   );
 }
 

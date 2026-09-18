@@ -258,13 +258,30 @@ Aturan folder:
 7. File route entry boleh tipis dan mengimpor page dari module. Ini adalah
    pengecualian teknis Next.js, bukan penyebaran business logic.
 
+Aturan layout project:
+
+- Header aplikasi memakai padding horizontal 30px dan hanya berisi search global
+  serta profil/user menu di kanan.
+- Breadcrumb tidak berada di header; breadcrumb berada di body halaman pada row
+  pertama bersama action/filter/search halaman.
+- Breadcrumb maksimal 3 level. Halaman detail memakai pola icon grid, tiga dot,
+  lalu `Detail <nama data>`.
+- Halaman tidak menampilkan title/deskripsi visual bila nama halaman sudah
+  jelas dari breadcrumb.
+- Filter dropdown, date picker, search halaman, dan button aksi halaman berada
+  di kanan breadcrumb, bukan di dalam card form.
+- Gunakan custom select dan custom date picker dari `component/ui/`; jangan
+  memakai native `<select>` atau tampilan date input browser sebagai UI final.
+- Jangan membuat card di dalam card. Form dan filter berdiri sendiri; card
+  hanya untuk satu unit informasi, table shell, dialog, atau state penting.
+
 Gunakan nama folder dan file lowercase dengan underscore bila nama terdiri dari
 beberapa kata, kecuali nama file khusus framework seperti `page.tsx`,
 `route.ts`, `loading.tsx`, dan `error.tsx`.
 
 ### 4.1 UI layer
 
-UI hanya menyusun page header, table, form, tabs, dialog, badge, state, widget,
+UI hanya menyusun breadcrumb row, table, form, tabs, dialog, badge, state, widget,
 dan route. UI tidak membangun header Authorization dan tidak mengetahui cara
 refresh token. Component dan widget tidak boleh mengimpor adapter SISTER atau
 Prisma.

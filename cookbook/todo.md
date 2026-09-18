@@ -312,10 +312,15 @@ library atau tabel sudah dibuat.
       repository, browser, build artifact, atau log.
 - [ ] Implementasikan layout sidebar 224px, topbar, page header, dan responsive
       contract.
+- [ ] Terapkan header 30px yang hanya berisi search global dan profil.
+- [ ] Terapkan breadcrumb body maksimal 3 level dengan action/filter/search
+      halaman rata kanan.
+- [ ] Hapus title/deskripsi visual halaman yang sudah jelas dari breadcrumb.
+- [ ] Hindari nested card dan jangan membungkus form filter dengan card.
 - [ ] Tambahkan `apexcharts` dan `react-apexcharts`, lalu buat wrapper
       `ReportChart` client-only sesuai design-system.md.
-- [ ] Implementasikan primitive Button, IconButton, Select, DataTable, StatusBadge,
-      Dialog, Tabs, HelpTip, State, dan Pagination.
+- [ ] Implementasikan primitive Button, IconButton, Select, DatePicker,
+      DataTable, StatusBadge, Dialog, Tabs, HelpTip, State, dan Pagination.
 - [ ] Uji primitive dengan keyboard dan screen reader semantics.
 
 ## 2. Schema dan persistence lokal
