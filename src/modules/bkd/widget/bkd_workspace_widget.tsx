@@ -27,58 +27,64 @@ const activityTabs = [
 
 type ActivityKey = (typeof activityTabs)[number]["key"];
 
-export function BkdWorkspaceWidget() {
+type BkdWorkspaceWidgetProps = {
+  sdmId?: string;
+};
+
+export function BkdWorkspaceWidget({ sdmId }: BkdWorkspaceWidgetProps = {}) {
   const trpc = useTRPC();
-  const [selectedSdmId, setSelectedSdmId] = useState("");
+  const [pickedSdmId, setPickedSdmId] = useState("");
   const [selectedSemesterId, setSelectedSemesterId] = useState("");
   const [activeTab, setActiveTab] = useState<ActivityKey>("pendidikan");
-  const hasSelection = Boolean(selectedSdmId && selectedSemesterId);
+  const effectiveSdmId = sdmId ?? pickedSdmId;
+  const hasSelection = Boolean(effectiveSdmId && selectedSemesterId);
 
-  const pegawaiQuery = useQuery(
-    trpc.pegawai.search.queryOptions({
+  const pegawaiQuery = useQuery({
+    ...trpc.pegawai.search.queryOptions({
       search_by: "nama",
       search: "",
       page: 1,
       per_page: 50,
     }),
-  );
+    enabled: !sdmId,
+  });
   const semesterQuery = useQuery(trpc.referensi.get_semester.queryOptions({}));
 
   const laporanQuery = useQuery({
-    ...trpc.bkd.laporan_akhir.queryOptions({ id_sdm: selectedSdmId || emptySdmId }),
-    enabled: Boolean(selectedSdmId),
+    ...trpc.bkd.laporan_akhir.queryOptions({ id_sdm: effectiveSdmId || emptySdmId }),
+    enabled: Boolean(effectiveSdmId),
   });
   const pendidikanQuery = useQuery({
     ...trpc.bkd.pendidikan.queryOptions({
-      id_sdm: selectedSdmId || emptySdmId,
+      id_sdm: effectiveSdmId || emptySdmId,
       id_smt: selectedSemesterId || emptySemesterId,
     }),
     enabled: hasSelection && activeTab === "pendidikan",
   });
   const ajarQuery = useQuery({
     ...trpc.bkd.ajar.queryOptions({
-      id_sdm: selectedSdmId || emptySdmId,
+      id_sdm: effectiveSdmId || emptySdmId,
       id_smt: selectedSemesterId || emptySemesterId,
     }),
     enabled: hasSelection && activeTab === "ajar",
   });
   const tunjangQuery = useQuery({
     ...trpc.bkd.tunjang.queryOptions({
-      id_sdm: selectedSdmId || emptySdmId,
+      id_sdm: effectiveSdmId || emptySdmId,
       id_smt: selectedSemesterId || emptySemesterId,
     }),
     enabled: hasSelection && activeTab === "tunjang",
   });
   const pengmasQuery = useQuery({
     ...trpc.bkd.pengmas.queryOptions({
-      id_sdm: selectedSdmId || emptySdmId,
+      id_sdm: effectiveSdmId || emptySdmId,
       id_smt: selectedSemesterId || emptySemesterId,
     }),
     enabled: hasSelection && activeTab === "pengmas",
   });
   const penelitianQuery = useQuery({
     ...trpc.bkd.penelitian.queryOptions({
-      id_sdm: selectedSdmId || emptySdmId,
+      id_sdm: effectiveSdmId || emptySdmId,
       id_smt: selectedSemesterId || emptySemesterId,
     }),
     enabled: hasSelection && activeTab === "penelitian",
@@ -92,26 +98,28 @@ export function BkdWorkspaceWidget() {
     penelitian: penelitianQuery,
   }[activeTab];
   const selectedPegawai = pegawaiQuery.data?.items.find(
-    (item) => item.id_sdm === selectedSdmId,
+    (item) => item.id_sdm === effectiveSdmId,
   );
 
   return (
     <section className="space-y-6">
       <div className="flex flex-col items-stretch gap-3 md:flex-row md:items-center md:justify-end">
-        {pegawaiQuery.data?.source && <SourceBadge source={pegawaiQuery.data.source} />}
-        <Select
-          ariaLabel="Pilih pegawai untuk BKD"
-          disabled={pegawaiQuery.isPending || pegawaiQuery.isError}
-          onValueChange={setSelectedSdmId}
-          options={[
-            { label: "Pilih pegawai", value: "" },
-            ...(pegawaiQuery.data?.items.map((item) => ({
-              label: `${item.nama_sdm}${item.nidn ? ` - ${item.nidn}` : ""}`,
-              value: item.id_sdm,
-            })) ?? []),
-          ]}
-          value={selectedSdmId}
-        />
+        {!sdmId && pegawaiQuery.data?.source && <SourceBadge source={pegawaiQuery.data.source} />}
+        {!sdmId && (
+          <Select
+            ariaLabel="Pilih pegawai untuk BKD"
+            disabled={pegawaiQuery.isPending || pegawaiQuery.isError}
+            onValueChange={setPickedSdmId}
+            options={[
+              { label: "Pilih pegawai", value: "" },
+              ...(pegawaiQuery.data?.items.map((item) => ({
+                label: `${item.nama_sdm}${item.nidn ? ` - ${item.nidn}` : ""}`,
+                value: item.id_sdm,
+              })) ?? []),
+            ]}
+            value={pickedSdmId}
+          />
+        )}
         <Select
           ariaLabel="Pilih semester"
           disabled={semesterQuery.isPending || semesterQuery.isError}
@@ -125,10 +133,10 @@ export function BkdWorkspaceWidget() {
           ]}
           value={selectedSemesterId}
         />
-        {(pegawaiQuery.isPending || semesterQuery.isPending) && (
+        {((!sdmId && pegawaiQuery.isPending) || semesterQuery.isPending) && (
           <p className="text-xs text-[hsl(var(--color-muted))]">Memuat pilihan...</p>
         )}
-        {selectedPegawai && selectedSemesterId && (
+        {!sdmId && selectedPegawai && selectedSemesterId && (
           <p className="text-xs text-[hsl(var(--color-muted))]">
             Konteks aktif:{" "}
             <span className="font-semibold text-[hsl(var(--color-text))]">
@@ -139,7 +147,7 @@ export function BkdWorkspaceWidget() {
         )}
       </div>
 
-      {(pegawaiQuery.isError || semesterQuery.isError) && (
+      {((!sdmId && pegawaiQuery.isError) || semesterQuery.isError) && (
         <State
           description="Periksa session dan koneksi SISTER."
           title="Pilihan SDM atau semester belum dapat dimuat"
@@ -148,9 +156,13 @@ export function BkdWorkspaceWidget() {
       )}
       {!hasSelection && (
         <State
-          description="Data BKD akan dimuat setelah kedua referensi dipilih."
+          description={
+            sdmId
+              ? "Data BKD akan dimuat setelah semester dipilih."
+              : "Data BKD akan dimuat setelah kedua referensi dipilih."
+          }
           icon={<SlidersHorizontal aria-hidden size={18} />}
-          title="Pilih SDM dan semester terlebih dahulu"
+          title={sdmId ? "Pilih semester terlebih dahulu" : "Pilih SDM dan semester terlebih dahulu"}
         />
       )}
 

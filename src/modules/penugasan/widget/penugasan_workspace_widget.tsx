@@ -14,77 +14,85 @@ import { PenugasanTable } from "./penugasan_table";
 
 const emptySdmId = "00000000-0000-0000-0000-000000000000";
 
-export function PenugasanWorkspaceWidget() {
-  const trpc = useTRPC();
-  const [selectedSdmId, setSelectedSdmId] = useState("");
+type PenugasanWorkspaceWidgetProps = {
+  sdmId?: string;
+};
 
-  const pegawaiQuery = useQuery(
-    trpc.pegawai.search.queryOptions({
+export function PenugasanWorkspaceWidget({ sdmId }: PenugasanWorkspaceWidgetProps = {}) {
+  const trpc = useTRPC();
+  const [pickedSdmId, setPickedSdmId] = useState("");
+  const effectiveSdmId = sdmId ?? pickedSdmId;
+
+  const pegawaiQuery = useQuery({
+    ...trpc.pegawai.search.queryOptions({
       search_by: "nama",
       search: "",
       page: 1,
       per_page: 50,
     }),
-  );
+    enabled: !sdmId,
+  });
   const penugasanQuery = useQuery({
-    ...trpc.penugasan.list.queryOptions({ id_sdm: selectedSdmId || emptySdmId }),
-    enabled: Boolean(selectedSdmId),
+    ...trpc.penugasan.list.queryOptions({ id_sdm: effectiveSdmId || emptySdmId }),
+    enabled: Boolean(effectiveSdmId),
   });
   const selectedPegawai = pegawaiQuery.data?.items.find(
-    (item) => item.id_sdm === selectedSdmId,
+    (item) => item.id_sdm === effectiveSdmId,
   );
 
   return (
     <section className="space-y-4">
-      <div className="flex flex-col items-stretch gap-3 md:flex-row md:items-center md:justify-end">
-        {pegawaiQuery.data?.source && <SourceBadge source={pegawaiQuery.data.source} />}
-        <Select
-          ariaLabel="Pilih pegawai untuk penugasan"
-          disabled={pegawaiQuery.isPending || pegawaiQuery.isError}
-          onValueChange={setSelectedSdmId}
-          options={[
-            { label: "Pilih pegawai", value: "" },
-            ...(pegawaiQuery.data?.items.map((item) => ({
-              label: `${item.nama_sdm}${item.nidn ? ` - ${item.nidn}` : ""}`,
-              value: item.id_sdm,
-            })) ?? []),
-          ]}
-          value={selectedSdmId}
-        />
-        {pegawaiQuery.isPending && (
-          <p className="text-xs text-[hsl(var(--color-muted))]">Memuat daftar pegawai...</p>
-        )}
-        {selectedPegawai && (
-          <p className="text-xs text-[hsl(var(--color-muted))]">
-            Konteks aktif:{" "}
-            <span className="font-semibold text-[hsl(var(--color-text))]">
-              {selectedPegawai.nama_sdm}
-            </span>
-          </p>
-        )}
-      </div>
+      {!sdmId && (
+        <div className="flex flex-col items-stretch gap-3 md:flex-row md:items-center md:justify-end">
+          {pegawaiQuery.data?.source && <SourceBadge source={pegawaiQuery.data.source} />}
+          <Select
+            ariaLabel="Pilih pegawai untuk penugasan"
+            disabled={pegawaiQuery.isPending || pegawaiQuery.isError}
+            onValueChange={setPickedSdmId}
+            options={[
+              { label: "Pilih pegawai", value: "" },
+              ...(pegawaiQuery.data?.items.map((item) => ({
+                label: `${item.nama_sdm}${item.nidn ? ` - ${item.nidn}` : ""}`,
+                value: item.id_sdm,
+              })) ?? []),
+            ]}
+            value={pickedSdmId}
+          />
+          {pegawaiQuery.isPending && (
+            <p className="text-xs text-[hsl(var(--color-muted))]">Memuat daftar pegawai...</p>
+          )}
+          {selectedPegawai && (
+            <p className="text-xs text-[hsl(var(--color-muted))]">
+              Konteks aktif:{" "}
+              <span className="font-semibold text-[hsl(var(--color-text))]">
+                {selectedPegawai.nama_sdm}
+              </span>
+            </p>
+          )}
+        </div>
+      )}
 
-      {pegawaiQuery.isError && (
+      {!sdmId && pegawaiQuery.isError && (
         <State
           description="Periksa session dan koneksi SISTER."
           title="Daftar pegawai belum dapat dimuat"
           tone="error"
         />
       )}
-      {!selectedSdmId && (
+      {!effectiveSdmId && (
         <State
           description="Data penugasan akan dimuat setelah SDM dipilih."
           icon={<ClipboardList aria-hidden size={18} />}
           title="Pilih pegawai terlebih dahulu"
         />
       )}
-      {selectedSdmId && penugasanQuery.isPending && (
+      {effectiveSdmId && penugasanQuery.isPending && (
         <State description="Mohon tunggu sebentar." title="Memuat penugasan..." tone="loading" />
       )}
-      {selectedSdmId && penugasanQuery.isError && (
+      {effectiveSdmId && penugasanQuery.isError && (
         <State title="Daftar penugasan belum dapat dimuat" tone="error" />
       )}
-      {selectedSdmId && penugasanQuery.data?.items.length === 0 && (
+      {effectiveSdmId && penugasanQuery.data?.items.length === 0 && (
         <State description="Belum ada penugasan untuk pegawai ini." title="Belum ada penugasan" />
       )}
       {penugasanQuery.data && penugasanQuery.data.items.length > 0 && (

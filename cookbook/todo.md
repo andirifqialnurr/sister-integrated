@@ -319,6 +319,41 @@ dibutuhkan halaman" pada MVP read-only, memakai `GET /referensi/wilayah`
 - [ ] Browser QA manual (refresh sungguhan pada tiap route detail) belum
       dilakukan; evidence saat ini adalah source-level check.
 
+## Halaman dan UX MVP checkpoint: 2026-09-18
+
+Lima perbaikan kecil-menengah yang menutup sebagian besar item section 5,
+masing-masing dengan commit terpisah.
+
+- [x] `BkdWorkspaceWidget` memakai primitive `Tabs` (bukan `role="tab"` hasil
+      tulis tangan) untuk lima tab aktivitas BKD, sehingga arrow key/Home/End
+      navigation ikut berfungsi sesuai kontrak `design-system.md`.
+- [x] Dashboard (`OverviewPage`) memuat stat "SDM terindeks" dari
+      `pegawai.search` sungguhan (loading/error state, bukan angka statis);
+      dua stat lain tetap dash karena belum ada sumber data ajuan/sinkronisasi
+      nyata. Header action button memakai component `Button` bersama, bukan
+      `<button>` mentah.
+- [x] Icon-only button yang sebelumnya hanya punya `aria-label` (toggle
+      sidebar mobile, tombol prev/next `Pagination`) sekarang juga punya
+      `title` sebagai tooltip, konsisten dengan `Dialog` dan `ThemeToggle`
+      yang sudah benar.
+- [x] `ReportChart` (sempat dibuat tapi tidak pernah dipakai) sekarang
+      memvisualisasikan SKS kinerja vs lebih per unsur pada laporan akhir
+      BKD sebagai bar chart; menambah prop `type` opsional dan reduced
+      motion tanpa mengubah default pemakaian sebelumnya (belum ada).
+- [x] Halaman detail SDM (`/pegawai/{id_sdm}`) menambah tab Ringkasan,
+      Penugasan, Pendidikan Formal, Riwayat Pekerjaan, dan BKD yang tetap
+      berada dalam konteks SDM yang sama; empat workspace widget module lain
+      menerima prop opsional `sdmId` yang menyembunyikan selector SDM
+      miliknya sendiri dan langsung query dengan `id_sdm` dari halaman induk
+      saat dipakai lewat tab ini. Widget yang sama tetap bisa dipakai berdiri
+      sendiri (dengan selector) di halaman module masing-masing.
+- [x] `bun run typecheck`, `bun run lint`, dan `bunx vitest run` (94/94)
+      lulus setelah kelima perubahan; endpoint tRPC yang relevan diverifikasi
+      langsung lewat dev server fixture mode.
+- [ ] Tidak ada akses browser di sesi ini untuk QA visual/keyboard sungguhan
+      atas Tabs baru; verifikasi dilakukan lewat source review, typecheck,
+      dan pemanggilan endpoint tRPC yang mendasari tiap tab secara langsung.
+
 ## 0. Gate kontrak eksternal
 
 - [ ] Identifikasi perguruan tinggi target dan instance SISTER yang akan dipakai.
@@ -486,15 +521,15 @@ MVP read-only harus divalidasi dahulu sebelum menambah write operation.
 
 - [ ] Halaman login atau konfigurasi auth sesuai keputusan gate.
 - [ ] Halaman dashboard ringkas dengan data yang benar-benar tersedia dari API.
-- [ ] Halaman pencarian SDM.
-- [ ] Halaman detail SDM dengan tabs yang tetap berada dalam konteks SDM.
-- [ ] Halaman BKD dengan filter semester.
-- [ ] Halaman referensi atau selector yang diperlukan oleh form.
-- [ ] Halaman status integrasi dan health check yang tidak membocorkan secret.
-- [ ] Gunakan `ReportChart` berbasis ApexCharts hanya untuk angka agregat yang
+- [x] Halaman pencarian SDM.
+- [x] Halaman detail SDM dengan tabs yang tetap berada dalam konteks SDM.
+- [x] Halaman BKD dengan filter semester.
+- [x] Halaman referensi atau selector yang diperlukan oleh form.
+- [x] Halaman status integrasi dan health check yang tidak membocorkan secret.
+- [x] Gunakan `ReportChart` berbasis ApexCharts hanya untuk angka agregat yang
       benar-benar tersedia dari response SISTER.
 - [ ] State permission untuk VIEWER, REVIEWER, OPERATOR, dan ADMIN.
-- [ ] Tooltip untuk icon-only button.
+- [x] Tooltip untuk icon-only button.
 - [ ] Tabel scroll horizontal hanya pada table shell.
 - [ ] Test light/dark pada 1280, 1024, 390, dan 320 pixel.
 
