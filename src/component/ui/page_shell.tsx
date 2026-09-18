@@ -25,7 +25,7 @@ export function PageShell({
     <div className="flex min-h-screen">
       <Sidebar activeLabel={activeLabel} />
       <div className="min-w-0 flex-1 bg-[hsl(var(--color-canvas))]">
-        <AppHeader />
+        <AppHeader maxWidth={maxWidth} />
         <main
           className="mx-auto min-w-0 space-y-6 px-[30px] py-6"
           style={{ maxWidth }}
