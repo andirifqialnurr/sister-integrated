@@ -77,6 +77,34 @@ export const semesterSchema = z
 
 export const semesterListSchema = z.array(semesterSchema);
 
+export const perguruanTinggiSchema = z
+  .object({
+    id: z.string(),
+    nama: z.string(),
+  })
+  .passthrough();
+
+export const perguruanTinggiListSchema = z.array(perguruanTinggiSchema);
+
+export const unitKerjaSchema = z
+  .object({
+    id: z.string(),
+    nama: z.string(),
+    id_jenis_unit: z.union([
+      z.literal(1),
+      z.literal(2),
+      z.literal(3),
+      z.literal(4),
+      z.literal(5),
+      z.literal(6),
+      z.literal(7),
+      z.literal(8),
+    ]),
+  })
+  .passthrough();
+
+export const unitKerjaListSchema = z.array(unitKerjaSchema);
+
 export const wilayahSchema = z
   .object({
     id: z.string(),
@@ -256,6 +284,8 @@ export type SdmProfile = z.infer<typeof sdmProfileSchema>;
 export type SdmEmployment = z.infer<typeof sdmEmploymentSchema>;
 export type ProfilPt = z.infer<typeof profilPtSchema>;
 export type Semester = z.infer<typeof semesterSchema>;
+export type PerguruanTinggi = z.infer<typeof perguruanTinggiSchema>;
+export type UnitKerja = z.infer<typeof unitKerjaSchema>;
 export type Wilayah = z.infer<typeof wilayahSchema>;
 export type BkdLaporanAkhir = z.infer<typeof bkdLaporanAkhirSchema>;
 export type BkdActivity = z.infer<typeof bkdActivitySchema>;

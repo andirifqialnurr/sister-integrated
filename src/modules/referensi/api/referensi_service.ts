@@ -1,12 +1,16 @@
 import { getSisterConfig } from "@/server/sister/config";
-import type { ProfilPt, Semester, Wilayah } from "@/server/sister/types";
+import type { PerguruanTinggi, ProfilPt, Semester, UnitKerja, Wilayah } from "@/server/sister/types";
 
 import {
+  referensiPerguruanTinggiResponseSchema,
   referensiProfilPtResponseSchema,
   referensiSemesterResponseSchema,
+  referensiUnitKerjaResponseSchema,
   referensiWilayahResponseSchema,
+  type ReferensiPerguruanTinggiResponse,
   type ReferensiProfilPtResponse,
   type ReferensiSemesterResponse,
+  type ReferensiUnitKerjaResponse,
   type ReferensiWilayahResponse,
 } from "../schema/referensi_schemas";
 import {
@@ -56,6 +60,21 @@ function toSafeWilayah(wilayah: Wilayah) {
   };
 }
 
+function toSafePerguruanTinggi(perguruanTinggi: PerguruanTinggi) {
+  return {
+    id: perguruanTinggi.id,
+    nama: perguruanTinggi.nama,
+  };
+}
+
+function toSafeUnitKerja(unitKerja: UnitKerja) {
+  return {
+    id: unitKerja.id,
+    nama: unitKerja.nama,
+    id_jenis_unit: unitKerja.id_jenis_unit,
+  };
+}
+
 export async function getProfilPt(
   dataSource: ReferensiDataSource = createReferensiDataSource(),
 ): Promise<ReferensiProfilPtResponse> {
@@ -91,6 +110,33 @@ export async function getWilayah(
 
   return referensiWilayahResponseSchema.parse({
     items: items.map(toSafeWilayah),
+    source: config.fixture_mode ? "fixture" : "sister",
+    fetched_at: new Date().toISOString(),
+  });
+}
+
+export async function getPerguruanTinggi(
+  dataSource: ReferensiDataSource = createReferensiDataSource(),
+): Promise<ReferensiPerguruanTinggiResponse> {
+  const config = getSisterConfig();
+  const items = await dataSource.getPerguruanTinggi();
+
+  return referensiPerguruanTinggiResponseSchema.parse({
+    items: items.map(toSafePerguruanTinggi),
+    source: config.fixture_mode ? "fixture" : "sister",
+    fetched_at: new Date().toISOString(),
+  });
+}
+
+export async function getUnitKerja(
+  idPerguruanTinggi: string,
+  dataSource: ReferensiDataSource = createReferensiDataSource(),
+): Promise<ReferensiUnitKerjaResponse> {
+  const config = getSisterConfig();
+  const items = await dataSource.getUnitKerja(idPerguruanTinggi);
+
+  return referensiUnitKerjaResponseSchema.parse({
+    items: items.map(toSafeUnitKerja),
     source: config.fixture_mode ? "fixture" : "sister",
     fetched_at: new Date().toISOString(),
   });

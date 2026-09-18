@@ -296,10 +296,30 @@ dibutuhkan halaman" pada MVP read-only, memakai `GET /referensi/wilayah`
       level 0.
 - [ ] Response live `/referensi/wilayah` belum diuji karena credential dan
       UAT belum tersedia.
-- [ ] `/referensi/unit_kerja`, `/referensi/detail_unit_kerja`,
-      `/referensi/mahasiswa_pddikti`, `/referensi/kategori_kegiatan`,
-      `/referensi/kelompok_bidang`, dan `/referensi/media_publikasi` pada
-      tabel `schema.md` 5.4 belum diimplementasikan.
+- [ ] `/referensi/detail_unit_kerja`, `/referensi/mahasiswa_pddikti`,
+      `/referensi/kategori_kegiatan`, `/referensi/kelompok_bidang`, dan
+      `/referensi/media_publikasi` pada tabel `schema.md` 5.4 belum
+      diimplementasikan.
+
+Tambahan 2026-09-18: `GET /referensi/perguruan_tinggi` (PDF halaman 231, tanpa
+parameter) dan `GET /referensi/unit_kerja` (PDF halaman 232, query wajib
+`id_perguruan_tinggi` UUID) sebagai contoh kedua.
+
+- [x] Schema runtime `unit_kerja` mengikuti `id_jenis_unit` enum 1-8 sesuai
+      PDF dan menolak nilai di luar itu; `perguruan_tinggi` mengikuti dua
+      field `id`/`nama`.
+- [x] Adapter live `unit_kerja` hanya mengirim query `id_perguruan_tinggi`;
+      `perguruan_tinggi` tanpa parameter, keduanya path tetap.
+- [x] Berbeda dari `wilayah`, `unit_kerja` benar-benar difilter oleh SISTER
+      di server melalui query `id_perguruan_tinggi`, bukan difilter di
+      client; UI memilih perguruan tinggi lebih dulu sebelum unit kerja
+      di-query.
+- [x] Halaman `/referensi` menambah panel "Unit kerja (referensi
+      bertingkat)" dengan dua `Select` berjenjang.
+- [x] Test schema, adapter, service, dan router (termasuk penolakan
+      `id_perguruan_tinggi` yang bukan UUID) lulus lewat `bunx vitest run`.
+- [ ] Response live `/referensi/perguruan_tinggi` dan `/referensi/unit_kerja`
+      belum diuji karena credential dan UAT belum tersedia.
 
 ## MVP read-only UX audit checkpoint: 2026-09-18
 

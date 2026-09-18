@@ -6,7 +6,13 @@ vi.mock("@/server/sister/http_client", () => ({
   sisterGet: sisterGetMock,
 }));
 
-import { profilPtListSchema, semesterListSchema, wilayahListSchema } from "@/server/sister/types";
+import {
+  perguruanTinggiListSchema,
+  profilPtListSchema,
+  semesterListSchema,
+  unitKerjaListSchema,
+  wilayahListSchema,
+} from "@/server/sister/types";
 
 import { FixtureReferensiAdapter, SisterReferensiAdapter } from "./referensi_adapter";
 
@@ -35,6 +41,18 @@ describe("FixtureReferensiAdapter", () => {
 
     expect(negara).toEqual([{ id: "ID", nama: "Indonesia (Fixture)", id_induk_wilayah: "" }]);
     expect(provinsi.every((item) => item.id_induk_wilayah === negara[0]?.id)).toBe(true);
+  });
+
+  it("returns unit kerja scoped to the requested perguruan tinggi", async () => {
+    const adapter = new FixtureReferensiAdapter();
+
+    const perguruanTinggi = await adapter.getPerguruanTinggi();
+    const unitKerja = await adapter.getUnitKerja(perguruanTinggi[0]!.id);
+    const unknownPtUnitKerja = await adapter.getUnitKerja("00000000-0000-4000-8000-000000000000");
+
+    expect(perguruanTinggi.length).toBeGreaterThan(0);
+    expect(unitKerja.length).toBeGreaterThan(0);
+    expect(unknownPtUnitKerja).toEqual([]);
   });
 });
 
@@ -74,6 +92,26 @@ describe("SisterReferensiAdapter", () => {
       path: "/referensi/wilayah",
       query: { id_level_wilayah: 2 },
       schema: wilayahListSchema,
+    });
+  });
+
+  it("calls unit_kerja with only id_perguruan_tinggi and no invented parameters", async () => {
+    sisterGetMock.mockResolvedValueOnce([]).mockResolvedValueOnce([]);
+    const adapter = new SisterReferensiAdapter();
+    const callsBefore = sisterGetMock.mock.calls.length;
+
+    await adapter.getPerguruanTinggi();
+    await adapter.getUnitKerja("11111111-1111-4111-8111-111111111111");
+
+    const [perguruanTinggiCall, unitKerjaCall] = sisterGetMock.mock.calls.slice(callsBefore);
+    expect(perguruanTinggiCall?.[0]).toEqual({
+      path: "/referensi/perguruan_tinggi",
+      schema: perguruanTinggiListSchema,
+    });
+    expect(unitKerjaCall?.[0]).toEqual({
+      path: "/referensi/unit_kerja",
+      query: { id_perguruan_tinggi: "11111111-1111-4111-8111-111111111111" },
+      schema: unitKerjaListSchema,
     });
   });
 });

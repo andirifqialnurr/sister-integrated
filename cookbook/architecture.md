@@ -454,17 +454,22 @@ Read-only reference flow yang sudah diimplementasikan:
     `/referensi/profil_pt` -> ReferensiDataSource.getProfilPt()
     `/referensi/semester` -> ReferensiDataSource.getSemester()
     `/referensi/wilayah` -> ReferensiDataSource.getWilayah(id_level_wilayah)
+    `/referensi/perguruan_tinggi` -> ReferensiDataSource.getPerguruanTinggi()
+    `/referensi/unit_kerja` -> ReferensiDataSource.getUnitKerja(id_perguruan_tinggi)
 
-`profil_pt` dan `semester` tidak menerima query dari browser, diparse sebagai
-array sesuai kontrak PDF, lalu dipetakan menjadi DTO eksplisit. `wilayah`
-adalah referensi bertingkat: browser hanya boleh mengirim `id_level_wilayah`
-(0-3) yang divalidasi sebagai enum, sedangkan hubungan parent/child
+`profil_pt`, `semester`, dan `perguruan_tinggi` tidak menerima query dari
+browser, diparse sebagai array sesuai kontrak PDF, lalu dipetakan menjadi DTO
+eksplisit. `wilayah` dan `unit_kerja` adalah referensi bertingkat, tetapi
+dengan mekanisme filter yang berbeda: `wilayah` hanya menerima
+`id_level_wilayah` (0-3) dari SISTER, sehingga hubungan parent/child
 (`id_induk_wilayah`) difilter di widget berdasarkan level yang sudah dipilih
-pengguna, bukan dikirim sebagai query baru ke SISTER karena PDF tidak
-mendokumentasikan parameter parent pada endpoint ini. Fixture dan live adapter
-memiliki interface yang sama. Implementasi awal belum menulis reference cache
-karena response belum dibutuhkan lintas request sebagai persistence; cache
-portable dapat ditambahkan setelah TTL dan minimisasi data ditetapkan.
+pengguna; `unit_kerja` benar-benar difilter oleh SISTER lewat query
+`id_perguruan_tinggi`, sehingga UI hanya perlu memilih perguruan tinggi lebih
+dulu (dari `/referensi/perguruan_tinggi`) lalu mengirim ID itu sebagai query,
+tanpa filter tambahan di client. Fixture dan live adapter memiliki interface
+yang sama. Implementasi awal belum menulis reference cache karena response
+belum dibutuhkan lintas request sebagai persistence; cache portable dapat
+ditambahkan setelah TTL dan minimisasi data ditetapkan.
 
 Modul BKD mengikuti alur referensi tersebut. UI tidak menerima UUID atau
 semester arbitrary dari user; user memilih SDM dan semester dari hasil query

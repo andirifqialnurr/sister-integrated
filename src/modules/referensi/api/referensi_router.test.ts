@@ -58,6 +58,30 @@ describe("referensi procedures", () => {
     ).rejects.toMatchObject({ code: "BAD_REQUEST" });
   });
 
+  it("returns unit kerja scoped to a perguruan tinggi through the protected router", async () => {
+    process.env.SISTER_FIXTURE_MODE = "true";
+
+    const caller = makeCaller();
+    const perguruanTinggi = await caller.referensi.get_perguruan_tinggi({});
+    const unitKerja = await caller.referensi.get_unit_kerja({
+      id_perguruan_tinggi: perguruanTinggi.items[0]!.id,
+    });
+
+    expect(perguruanTinggi.source).toBe("fixture");
+    expect(unitKerja.source).toBe("fixture");
+    expect(unitKerja.items.length).toBeGreaterThan(0);
+  });
+
+  it("rejects a non-UUID id_perguruan_tinggi for get_unit_kerja", async () => {
+    process.env.SISTER_FIXTURE_MODE = "true";
+
+    const caller = makeCaller();
+
+    await expect(
+      caller.referensi.get_unit_kerja({ id_perguruan_tinggi: "not-a-uuid" }),
+    ).rejects.toMatchObject({ code: "BAD_REQUEST" });
+  });
+
   it("requires a session before reading references", async () => {
     const caller = appRouter.createCaller({
       requestId: "referensi-request-unauthenticated",

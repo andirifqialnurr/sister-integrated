@@ -1,6 +1,6 @@
 "use client";
 
-import { Building2, CalendarDays, MapPin, RefreshCw } from "lucide-react";
+import { Building2, CalendarDays, MapPin, RefreshCw, Building } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 
 import { Button } from "@/component/ui/button";
@@ -10,6 +10,7 @@ import { useTRPC } from "@/lib/trpc";
 
 import { ProfilPtWidget } from "../widget/profil_pt_widget";
 import { SemesterTable } from "../widget/semester_table";
+import { UnitKerjaExplorerWidget } from "../widget/unit_kerja_explorer_widget";
 import { WilayahExplorerWidget } from "../widget/wilayah_explorer_widget";
 
 export function ReferensiPage() {
@@ -114,6 +115,17 @@ export function ReferensiPage() {
         />
         <div className="p-5">
           <WilayahExplorerWidget />
+        </div>
+      </section>
+
+      <section className="mt-6 min-w-0 rounded-xl border border-[hsl(var(--color-border))] bg-white shadow-[0_1px_2px_hsl(145_20%_20%/0.04)]">
+        <PanelHeader
+          description="GET /referensi/unit_kerja - id_perguruan_tinggi dari GET /referensi/perguruan_tinggi"
+          icon={<Building aria-hidden size={17} />}
+          title="Unit kerja (referensi bertingkat)"
+        />
+        <div className="p-5">
+          <UnitKerjaExplorerWidget />
         </div>
       </section>
     </PageShell>

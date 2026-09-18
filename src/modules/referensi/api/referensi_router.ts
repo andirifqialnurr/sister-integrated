@@ -4,8 +4,17 @@ import { z } from "zod";
 import { SisterApiError, SisterContractError } from "@/server/sister/errors";
 import { createTRPCRouter, protectedProcedure } from "@/server/trpc/init";
 
-import { referensiWilayahInputSchema } from "../schema/referensi_schemas";
-import { getProfilPt, getSemester, getWilayah } from "./referensi_service";
+import {
+  referensiUnitKerjaInputSchema,
+  referensiWilayahInputSchema,
+} from "../schema/referensi_schemas";
+import {
+  getPerguruanTinggi,
+  getProfilPt,
+  getSemester,
+  getUnitKerja,
+  getWilayah,
+} from "./referensi_service";
 
 const emptyInputSchema = z.object({});
 
@@ -61,4 +70,20 @@ export const referensiRouter = createTRPCRouter({
       return toSafeTrpcError(error);
     }
   }),
+  get_perguruan_tinggi: protectedProcedure.input(emptyInputSchema).query(async () => {
+    try {
+      return await getPerguruanTinggi();
+    } catch (error) {
+      return toSafeTrpcError(error);
+    }
+  }),
+  get_unit_kerja: protectedProcedure
+    .input(referensiUnitKerjaInputSchema)
+    .query(async ({ input }) => {
+      try {
+        return await getUnitKerja(input.id_perguruan_tinggi);
+      } catch (error) {
+        return toSafeTrpcError(error);
+      }
+    }),
 });

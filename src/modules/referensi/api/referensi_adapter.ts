@@ -1,10 +1,14 @@
 import { sisterGet } from "@/server/sister/http_client";
 import {
+  perguruanTinggiListSchema,
   profilPtListSchema,
   semesterListSchema,
+  unitKerjaListSchema,
   wilayahListSchema,
+  type PerguruanTinggi,
   type ProfilPt,
   type Semester,
+  type UnitKerja,
   type Wilayah,
 } from "@/server/sister/types";
 
@@ -14,6 +18,8 @@ export type ReferensiDataSource = {
   getProfilPt(): Promise<ProfilPt[]>;
   getSemester(): Promise<Semester[]>;
   getWilayah(idLevelWilayah: WilayahLevel): Promise<Wilayah[]>;
+  getPerguruanTinggi(): Promise<PerguruanTinggi[]>;
+  getUnitKerja(idPerguruanTinggi: string): Promise<UnitKerja[]>;
 };
 
 const fixtureProfilPt: ProfilPt[] = [
@@ -53,6 +59,19 @@ const fixtureWilayah: Record<WilayahLevel, Wilayah[]> = {
   3: [{ id: "327301", nama: "Kecamatan Coblong (Fixture)", id_induk_wilayah: "3273" }],
 };
 
+const fixturePerguruanTinggiId = "11111111-1111-4111-8111-111111111111";
+
+const fixturePerguruanTinggi: PerguruanTinggi[] = [
+  { id: fixturePerguruanTinggiId, nama: "Perguruan Tinggi Fixture" },
+];
+
+const fixtureUnitKerja: Record<string, UnitKerja[]> = {
+  [fixturePerguruanTinggiId]: [
+    { id: "unit-1", nama: "Fakultas Ilmu Komputer (Fixture)", id_jenis_unit: 1 },
+    { id: "unit-2", nama: "Program Studi Informatika (Fixture)", id_jenis_unit: 3 },
+  ],
+};
+
 export class FixtureReferensiAdapter implements ReferensiDataSource {
   async getProfilPt() {
     return fixtureProfilPt;
@@ -64,6 +83,14 @@ export class FixtureReferensiAdapter implements ReferensiDataSource {
 
   async getWilayah(idLevelWilayah: WilayahLevel) {
     return fixtureWilayah[idLevelWilayah];
+  }
+
+  async getPerguruanTinggi() {
+    return fixturePerguruanTinggi;
+  }
+
+  async getUnitKerja(idPerguruanTinggi: string) {
+    return fixtureUnitKerja[idPerguruanTinggi] ?? [];
   }
 }
 
@@ -87,6 +114,21 @@ export class SisterReferensiAdapter implements ReferensiDataSource {
       path: "/referensi/wilayah",
       query: { id_level_wilayah: idLevelWilayah },
       schema: wilayahListSchema,
+    });
+  }
+
+  async getPerguruanTinggi() {
+    return sisterGet({
+      path: "/referensi/perguruan_tinggi",
+      schema: perguruanTinggiListSchema,
+    });
+  }
+
+  async getUnitKerja(idPerguruanTinggi: string) {
+    return sisterGet({
+      path: "/referensi/unit_kerja",
+      query: { id_perguruan_tinggi: idPerguruanTinggi },
+      schema: unitKerjaListSchema,
     });
   }
 }

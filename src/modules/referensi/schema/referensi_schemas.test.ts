@@ -1,10 +1,19 @@
 import { describe, expect, it } from "vitest";
 
-import { profilPtListSchema, semesterListSchema, wilayahListSchema } from "@/server/sister/types";
+import {
+  perguruanTinggiListSchema,
+  profilPtListSchema,
+  semesterListSchema,
+  unitKerjaListSchema,
+  wilayahListSchema,
+} from "@/server/sister/types";
 
 import {
+  referensiPerguruanTinggiItemSchema,
   referensiProfilPtItemSchema,
   referensiSemesterItemSchema,
+  referensiUnitKerjaInputSchema,
+  referensiUnitKerjaItemSchema,
   referensiWilayahInputSchema,
   referensiWilayahItemSchema,
 } from "./referensi_schemas";
@@ -67,5 +76,33 @@ describe("SISTER referensi schemas", () => {
     }
     expect(referensiWilayahInputSchema.safeParse({ id_level_wilayah: 4 }).success).toBe(false);
     expect(referensiWilayahInputSchema.safeParse({ id_level_wilayah: "1" }).success).toBe(false);
+  });
+
+  it("accepts the documented perguruan_tinggi and unit_kerja responses", () => {
+    const perguruanTinggi = { id: "11111111-1111-4111-8111-111111111111", nama: "PT Uji" };
+    const unitKerja = { id: "unit-1", nama: "Fakultas Uji", id_jenis_unit: 1 };
+
+    expect(perguruanTinggiListSchema.safeParse([perguruanTinggi]).success).toBe(true);
+    expect(referensiPerguruanTinggiItemSchema.parse(perguruanTinggi)).toEqual(perguruanTinggi);
+
+    expect(unitKerjaListSchema.safeParse([unitKerja]).success).toBe(true);
+    expect(referensiUnitKerjaItemSchema.parse(unitKerja)).toEqual(unitKerja);
+    expect(unitKerjaListSchema.safeParse([{ ...unitKerja, id_jenis_unit: 9 }]).success).toBe(
+      false,
+    );
+    expect(
+      referensiUnitKerjaItemSchema.safeParse({ ...unitKerja, undocumented: "x" }).success,
+    ).toBe(false);
+  });
+
+  it("requires id_perguruan_tinggi to be a UUID for the unit_kerja query", () => {
+    expect(
+      referensiUnitKerjaInputSchema.safeParse({
+        id_perguruan_tinggi: "11111111-1111-4111-8111-111111111111",
+      }).success,
+    ).toBe(true);
+    expect(
+      referensiUnitKerjaInputSchema.safeParse({ id_perguruan_tinggi: "not-a-uuid" }).success,
+    ).toBe(false);
   });
 });
