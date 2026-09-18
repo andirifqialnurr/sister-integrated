@@ -1,8 +1,56 @@
+import { DataTable, type DataTableColumn } from "@/component/widget";
+
 import type { PendidikanFormalDetailResponse } from "../api/pendidikan_formal_schemas";
+
+type PendidikanFormalDocument = PendidikanFormalDetailResponse["item"]["dokumen"][number];
 
 type PendidikanFormalDetailWidgetProps = {
   item: PendidikanFormalDetailResponse["item"];
 };
+
+const documentColumns: DataTableColumn<PendidikanFormalDocument>[] = [
+  {
+    key: "nama",
+    header: "Nama",
+    render: (document) => (
+      <>
+        <p className="font-semibold text-[hsl(var(--color-text))]">{document.nama}</p>
+        <p className="mt-1 font-mono text-xs text-[hsl(var(--color-muted))]">{document.id}</p>
+      </>
+    ),
+  },
+  {
+    key: "jenis",
+    header: "Jenis / file",
+    render: (document) => (
+      <>
+        <p>{document.jenis_dokumen}</p>
+        <p className="mt-1">
+          {document.nama_file} · {document.jenis_file}
+        </p>
+      </>
+    ),
+    className: "text-xs text-[hsl(var(--color-muted))]",
+  },
+  {
+    key: "upload",
+    header: "Tanggal upload",
+    render: (document) => document.tanggal_upload,
+    className: "text-xs text-[hsl(var(--color-muted))]",
+  },
+  {
+    key: "tautan",
+    header: "Tautan",
+    render: (document) => document.tautan || "Tidak tersedia",
+    className: "max-w-[220px] break-words text-xs text-[hsl(var(--color-muted))]",
+  },
+  {
+    key: "keterangan",
+    header: "Keterangan",
+    render: (document) => document.keterangan || "Tidak tersedia",
+    className: "max-w-[220px] break-words text-xs text-[hsl(var(--color-muted))]",
+  },
+];
 
 export function PendidikanFormalDetailWidget({ item }: PendidikanFormalDetailWidgetProps) {
   return (
@@ -53,49 +101,16 @@ export function PendidikanFormalDetailWidget({ item }: PendidikanFormalDetailWid
             Metadata dokumen yang dikembalikan bersama detail pendidikan formal.
           </p>
         </div>
-        {item.dokumen.length === 0 ? (
-          <p className="p-8 text-center text-sm text-[hsl(var(--color-muted))]">
-            Tidak ada dokumen pada response SISTER.
-          </p>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full min-w-[900px] text-left text-sm">
-              <caption className="sr-only">Dokumen pendidikan formal</caption>
-              <thead className="bg-[hsl(var(--color-canvas))] text-xs text-[hsl(var(--color-muted))]">
-                <tr>
-                  <th className="px-5 py-3 font-semibold" scope="col">Nama</th>
-                  <th className="px-5 py-3 font-semibold" scope="col">Jenis / file</th>
-                  <th className="px-5 py-3 font-semibold" scope="col">Tanggal upload</th>
-                  <th className="px-5 py-3 font-semibold" scope="col">Tautan</th>
-                  <th className="px-5 py-3 font-semibold" scope="col">Keterangan</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-[hsl(var(--color-border))]">
-                {item.dokumen.map((document) => (
-                  <tr key={document.id}>
-                    <td className="px-5 py-4">
-                      <p className="font-semibold text-[hsl(var(--color-text))]">{document.nama}</p>
-                      <p className="mt-1 font-mono text-xs text-[hsl(var(--color-muted))]">{document.id}</p>
-                    </td>
-                    <td className="px-5 py-4 text-xs text-[hsl(var(--color-muted))]">
-                      <p>{document.jenis_dokumen}</p>
-                      <p className="mt-1">{document.nama_file} · {document.jenis_file}</p>
-                    </td>
-                    <td className="px-5 py-4 text-xs text-[hsl(var(--color-muted))]">
-                      {document.tanggal_upload}
-                    </td>
-                    <td className="max-w-[220px] break-words px-5 py-4 text-xs text-[hsl(var(--color-muted))]">
-                      {document.tautan || "Tidak tersedia"}
-                    </td>
-                    <td className="max-w-[220px] break-words px-5 py-4 text-xs text-[hsl(var(--color-muted))]">
-                      {document.keterangan || "Tidak tersedia"}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
+        <div className="p-5">
+          <DataTable
+            caption="Dokumen pendidikan formal"
+            columns={documentColumns}
+            empty="Tidak ada dokumen pada response SISTER."
+            getRowKey={(document) => document.id}
+            rows={item.dokumen}
+            tableClassName="min-w-[900px]"
+          />
+        </div>
       </article>
     </div>
   );

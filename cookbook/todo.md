@@ -530,7 +530,7 @@ MVP read-only harus divalidasi dahulu sebelum menambah write operation.
       benar-benar tersedia dari response SISTER.
 - [ ] State permission untuk VIEWER, REVIEWER, OPERATOR, dan ADMIN.
 - [x] Tooltip untuk icon-only button.
-- [ ] Tabel scroll horizontal hanya pada table shell.
+- [x] Tabel scroll horizontal hanya pada table shell.
 - [ ] Test light/dark pada 1280, 1024, 390, dan 320 pixel.
 
 ## 6. Satu workflow write terpilih

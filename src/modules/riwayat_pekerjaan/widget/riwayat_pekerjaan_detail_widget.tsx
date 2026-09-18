@@ -1,10 +1,26 @@
 import { BriefcaseBusiness, FileText } from "lucide-react";
 
+import { DataTable, type DataTableColumn } from "@/component/widget";
+
 import type { RiwayatPekerjaanDetailResponse } from "../api/riwayat_pekerjaan_schemas";
+
+type RiwayatPekerjaanDocument = RiwayatPekerjaanDetailResponse["item"]["dokumen"][number];
 
 type RiwayatPekerjaanDetailWidgetProps = {
   item: RiwayatPekerjaanDetailResponse["item"];
 };
+
+const documentColumns: DataTableColumn<RiwayatPekerjaanDocument>[] = [
+  { key: "nama", header: "Nama", render: (document) => document.nama },
+  { key: "jenis", header: "Jenis", render: (document) => document.jenis_dokumen },
+  {
+    key: "file",
+    header: "File",
+    render: (document) => document.nama_file || document.tautan || "-",
+  },
+  { key: "upload", header: "Upload", render: (document) => document.tanggal_upload || "-" },
+  { key: "keterangan", header: "Keterangan", render: (document) => document.keterangan || "-" },
+];
 
 function DetailField({ label, value }: { label: string; value: string | number | boolean }) {
   const displayValue =
@@ -71,46 +87,16 @@ export function RiwayatPekerjaanDetailWidget({ item }: RiwayatPekerjaanDetailWid
           <FileText aria-hidden className="text-[hsl(var(--color-primary))]" size={17} />
           <h2 className="text-sm font-bold text-[hsl(var(--color-text))]">Metadata dokumen</h2>
         </div>
-        {item.dokumen.length === 0 ? (
-          <p className="mt-4 text-sm text-[hsl(var(--color-muted))]">
-            Tidak ada metadata dokumen pada detail ini.
-          </p>
-        ) : (
-          <div className="mt-4 overflow-x-auto">
-            <table className="min-w-[760px] w-full text-left text-sm">
-              <thead className="text-xs uppercase tracking-[0.08em] text-[hsl(var(--color-muted))]">
-                <tr>
-                  <th className="border-b border-[hsl(var(--color-border))] py-2 font-semibold">Nama</th>
-                  <th className="border-b border-[hsl(var(--color-border))] py-2 font-semibold">Jenis</th>
-                  <th className="border-b border-[hsl(var(--color-border))] py-2 font-semibold">File</th>
-                  <th className="border-b border-[hsl(var(--color-border))] py-2 font-semibold">Upload</th>
-                  <th className="border-b border-[hsl(var(--color-border))] py-2 font-semibold">Keterangan</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-[hsl(var(--color-border))]">
-                {item.dokumen.map((document) => (
-                  <tr key={document.id}>
-                    <td className="py-3 pr-4 font-medium text-[hsl(var(--color-text))]">
-                      {document.nama}
-                    </td>
-                    <td className="py-3 pr-4 text-[hsl(var(--color-muted))]">
-                      {document.jenis_dokumen}
-                    </td>
-                    <td className="py-3 pr-4 text-[hsl(var(--color-muted))]">
-                      {document.nama_file || document.tautan || "-"}
-                    </td>
-                    <td className="py-3 pr-4 text-[hsl(var(--color-muted))]">
-                      {document.tanggal_upload || "-"}
-                    </td>
-                    <td className="py-3 pr-4 text-[hsl(var(--color-muted))]">
-                      {document.keterangan || "-"}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
+        <div className="mt-4">
+          <DataTable
+            caption="Metadata dokumen riwayat pekerjaan"
+            columns={documentColumns}
+            empty="Tidak ada metadata dokumen pada detail ini."
+            getRowKey={(document) => document.id}
+            rows={item.dokumen}
+            tableClassName="min-w-[760px]"
+          />
+        </div>
       </section>
     </section>
   );
