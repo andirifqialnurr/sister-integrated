@@ -464,6 +464,20 @@ masing-masing dengan commit terpisah.
       lalu throw, tidak retry setelah response non-2xx diterima) lulus lewat
       `bunx vitest run`.
 
+## Router test coverage parity checkpoint: 2026-09-18
+
+- [x] `pegawai_router.ts` adalah satu-satunya router tanpa test langsung
+      (semua router lain sudah punya `*_router.test.ts`); ditambahkan
+      `pegawai_router.test.ts` (4 test) yang menguji `search` + `get_detail`
+      lewat `appRouter.createCaller`, mapping `id_sdm` tidak dikenal ke
+      `NOT_FOUND`, penolakan `id_sdm` non-UUID sebelum masuk service layer,
+      dan penolakan unauthenticated caller untuk kedua procedure.
+- [x] Sekarang ke-8 router (bkd, overview, pegawai, pendidikan_formal,
+      penugasan, referensi, riwayat_pekerjaan, security) punya test yang
+      memverifikasi auth context (unauthenticated -> UNAUTHORIZED) dan
+      bentuk DTO output lewat caller sungguhan, bukan hanya lewat service
+      layer secara terpisah.
+
 ## 0. Gate kontrak eksternal
 
 - [ ] Identifikasi perguruan tinggi target dan instance SISTER yang akan dipakai.
@@ -734,7 +748,7 @@ menyatakan data bersumber PDDIKTI/read-only dan menyediakan beberapa PUT.
 - [ ] Unit test payload dan error mapping.
 - [ ] Contract test terhadap YAML resmi.
 - [ ] Integration test dengan UAT.
-- [ ] Unit/integration test untuk procedure tRPC, auth context, permission, dan
+- [x] Unit/integration test untuk procedure tRPC, auth context, permission, dan
       DTO output.
 - [ ] Browser test untuk happy path dan semua state UI.
 - [ ] Test access control pada setiap internal API route.
