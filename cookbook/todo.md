@@ -427,6 +427,22 @@ masing-masing dengan commit terpisah.
       `security_audit_event`; akan perlu evidence baru begitu logger
       ditambahkan.
 
+## Sidebar role-gating checkpoint: 2026-09-18
+
+- [x] Procedure baru `overview.session` (protected) mengembalikan hanya
+      `{ role }` dari `ctx.user`, tidak ada field session lain yang
+      terekspos ke client.
+- [x] `Sidebar` mengambil role lewat `overview.session` dan menyembunyikan
+      item navigasi "Audit security" (`requiresAdmin: true`) selama role
+      belum diketahui atau bukan `ADMIN`, alih-alih menampilkannya ke semua
+      role lalu mengandalkan halaman `/audit` menampilkan state forbidden.
+- [x] Test router: `overview.session` menolak unauthenticated dan
+      mengembalikan role yang sesuai untuk caller ber-session.
+- [ ] Ini baru membedakan ADMIN vs non-ADMIN untuk satu item navigasi;
+      belum ada state VIEWER/REVIEWER/OPERATOR yang berbeda satu sama lain
+      di halaman manapun karena belum ada fitur yang butuh granularitas itu.
+      Item checklist ini masih dianggap belum selesai.
+
 ## 0. Gate kontrak eksternal
 
 - [ ] Identifikasi perguruan tinggi target dan instance SISTER yang akan dipakai.

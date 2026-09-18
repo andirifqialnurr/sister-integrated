@@ -1,7 +1,7 @@
 import { getSisterConfigurationStatus } from "@/server/sister/config";
 import { createTRPCRouter, protectedProcedure, publicProcedure } from "@/server/trpc/init";
 
-import { overviewStatusSchema } from "../schema/overview_schema";
+import { overviewSessionSchema, overviewStatusSchema } from "../schema/overview_schema";
 
 export const overviewRouter = createTRPCRouter({
   health: publicProcedure.query(({ ctx }) => ({
@@ -10,6 +10,9 @@ export const overviewRouter = createTRPCRouter({
     request_id: ctx.requestId,
     sister_connected: false,
   })),
+  session: protectedProcedure.query(({ ctx }) =>
+    overviewSessionSchema.parse({ role: ctx.user.role }),
+  ),
   status: protectedProcedure.query(({ ctx }) => {
     const sisterStatus = getSisterConfigurationStatus();
 

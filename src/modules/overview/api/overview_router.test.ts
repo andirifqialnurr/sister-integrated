@@ -61,3 +61,19 @@ describe("overview status procedure", () => {
   });
 });
 
+describe("overview session procedure", () => {
+  it("returns only the caller's role, nothing else from the session", async () => {
+    await expect(makeCaller().overview.session()).resolves.toEqual({ role: "OPERATOR" });
+  });
+
+  it("requires a session", async () => {
+    const caller = appRouter.createCaller({
+      requestId: "request-unauthenticated",
+      request: new Request("https://app.test/api/trpc/overview.session"),
+      user: null,
+    });
+
+    await expect(caller.overview.session()).rejects.toMatchObject({ code: "UNAUTHORIZED" });
+  });
+});
+

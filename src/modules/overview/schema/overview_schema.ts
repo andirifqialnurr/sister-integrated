@@ -13,3 +13,9 @@ export const overviewStatusSchema = z.object({
 
 export type OverviewStatus = z.infer<typeof overviewStatusSchema>;
 
+export const overviewSessionSchema = z.object({
+  role: z.enum(["ADMIN", "OPERATOR", "REVIEWER", "VIEWER"]),
+});
+
+export type OverviewSession = z.infer<typeof overviewSessionSchema>;
+

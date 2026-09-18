@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useQuery } from "@tanstack/react-query";
 import {
   BarChart3,
   BriefcaseBusiness,
@@ -19,12 +20,14 @@ import {
 import type { LucideIcon } from "lucide-react";
 
 import { cn } from "@/lib/cn";
+import { useTRPC } from "@/lib/trpc";
 import { ThemeToggle } from "./theme_toggle";
 
 type NavigationItem = {
   label: string;
   href: "/" | "/pegawai" | "/referensi" | "/bkd" | "/penugasan" | "/pendidikan_formal" | "/riwayat_pekerjaan" | "/audit" | "#pengajuan" | "#dokumen";
   icon: LucideIcon;
+  requiresAdmin?: boolean;
 };
 
 const navigationItems: NavigationItem[] = [
@@ -36,11 +39,15 @@ const navigationItems: NavigationItem[] = [
   { label: "Pendidikan Formal", href: "/pendidikan_formal", icon: GraduationCap },
   { label: "Riwayat Pekerjaan", href: "/riwayat_pekerjaan", icon: BriefcaseBusiness },
   { label: "Pengajuan", href: "#pengajuan", icon: FileText },
-  { label: "Audit security", href: "/audit", icon: ShieldCheck },
+  { label: "Audit security", href: "/audit", icon: ShieldCheck, requiresAdmin: true },
 ];
 
 export function Sidebar({ activeLabel = "Ikhtisar" }: { activeLabel?: string }) {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const trpc = useTRPC();
+  const sessionQuery = useQuery(trpc.overview.session.queryOptions());
+  const isAdmin = sessionQuery.data?.role === "ADMIN";
+  const items = navigationItems.filter((item) => !item.requiresAdmin || isAdmin);
 
   return (
     <>
@@ -64,10 +71,11 @@ export function Sidebar({ activeLabel = "Ikhtisar" }: { activeLabel?: string }) 
         />
       )}
 
-      <SidebarPanel activeLabel={activeLabel} mobile={false} />
+      <SidebarPanel activeLabel={activeLabel} items={items} mobile={false} />
       {mobileOpen && (
         <SidebarPanel
           activeLabel={activeLabel}
+          items={items}
           mobile
           onNavigate={() => setMobileOpen(false)}
           open
@@ -79,11 +87,13 @@ export function Sidebar({ activeLabel = "Ikhtisar" }: { activeLabel?: string }) 
 
 function SidebarPanel({
   activeLabel,
+  items,
   mobile,
   onNavigate,
   open = false,
 }: {
   activeLabel: string;
+  items: NavigationItem[];
   mobile: boolean;
   onNavigate?: () => void;
   open?: boolean;
@@ -117,7 +127,7 @@ function SidebarPanel({
         <p className="mb-3 px-3 pt-2 text-[10px] font-bold uppercase tracking-[0.16em] text-[hsl(var(--color-muted))]">
           Workspace
         </p>
-        {navigationItems.map((item) => {
+        {items.map((item) => {
           const Icon = item.icon;
           const isActive = item.label === activeLabel;
 
