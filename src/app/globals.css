@@ -21,6 +21,28 @@
   --color-neutral-soft: 150 12% 93%;
 }
 
+.dark {
+  color-scheme: dark;
+  --color-primary: 142 70% 45%;
+  --color-primary-strong: 142 70% 55%;
+  --color-primary-soft: 152 24% 18%;
+  --color-canvas: 152 30% 7%;
+  --color-surface: 152 30% 10%;
+  --color-border: 152 24% 22%;
+  --color-text: 140 30% 98%;
+  --color-muted: 145 16% 65%;
+  --color-success: 142 69% 45%;
+  --color-success-strong: 142 69% 60%;
+  --color-success-soft: 142 35% 18%;
+  --color-warning: 43 96% 56%;
+  --color-warning-strong: 43 96% 70%;
+  --color-warning-soft: 38 45% 18%;
+  --color-danger: 0 63% 60%;
+  --color-danger-strong: 0 78% 72%;
+  --color-danger-soft: 0 35% 18%;
+  --color-neutral-soft: 152 24% 18%;
+}
+
 @theme inline {
   --color-primary: hsl(var(--color-primary));
   --color-primary-strong: hsl(var(--color-primary-strong));
@@ -38,6 +60,14 @@
 
 html {
   background: hsl(var(--color-canvas));
+}
+
+html.light {
+  color-scheme: light;
+}
+
+.dark .bg-white {
+  background-color: hsl(var(--color-surface));
 }
 
 body {

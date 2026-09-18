@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 
+import { ThemeProvider } from "@/component/theme-provider";
 import { TrpcProvider } from "@/lib/trpc";
 
 import "./globals.css";
@@ -17,7 +18,9 @@ export default function RootLayout({
   return (
     <html lang="id">
       <body>
-        <TrpcProvider>{children}</TrpcProvider>
+        <ThemeProvider>
+          <TrpcProvider>{children}</TrpcProvider>
+        </ThemeProvider>
       </body>
     </html>
   );
