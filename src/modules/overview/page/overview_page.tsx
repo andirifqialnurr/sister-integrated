@@ -1,3 +1,5 @@
+"use client";
+
 import {
   ArrowDownToLine,
   DatabaseZap,
@@ -5,27 +7,45 @@ import {
   RefreshCw,
   UsersRound,
 } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
 
+import { Button } from "@/component/ui/button";
 import { PageShell } from "@/component/ui/page_shell";
 import { StatusBadge } from "@/component/ui/status_badge";
 import { EmptyActivity } from "@/component/widget/empty_activity";
 import { StatCard } from "@/component/widget/stat_card";
+import { useTRPC } from "@/lib/trpc";
 
 import { OverviewStatusWidget } from "../widget/overview_status_widget";
 
 export function OverviewPage() {
+  const trpc = useTRPC();
+  const sdmCountQuery = useQuery(
+    trpc.pegawai.search.queryOptions({ search_by: "nama", search: "", page: 1, per_page: 1 }),
+  );
+  const sdmCountValue = sdmCountQuery.isPending
+    ? "…"
+    : sdmCountQuery.isError
+      ? "—"
+      : sdmCountQuery.data.total.toLocaleString("id-ID");
+  const sdmCountHelper = sdmCountQuery.isPending
+    ? "Memuat dari /referensi/sdm..."
+    : sdmCountQuery.isError
+      ? "Pencarian pegawai belum dapat dimuat"
+      : `Sumber: ${sdmCountQuery.data.source === "sister" ? "SISTER" : "fixture mode"}`;
+
   return (
     <PageShell
       actions={
         <>
-          <button className="inline-flex h-9 items-center gap-2 rounded-lg border border-[hsl(var(--color-border))] bg-white px-3.5 text-sm font-semibold text-[hsl(var(--color-text))] transition-colors hover:bg-[hsl(var(--color-primary-soft))]">
+          <Button variant="secondary">
             <RefreshCw aria-hidden size={15} />
             Sinkronisasi
-          </button>
-          <button className="inline-flex h-9 items-center gap-2 rounded-lg bg-[hsl(var(--color-primary))] px-3.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-[hsl(var(--color-primary-strong))]">
+          </Button>
+          <Button>
             <ArrowDownToLine aria-hidden size={15} />
             Konfigurasi
-          </button>
+          </Button>
         </>
       }
       breadcrumb={[{ label: "Ikhtisar" }]}
@@ -33,10 +53,10 @@ export function OverviewPage() {
 
           <section className="grid gap-4 md:grid-cols-3">
             <StatCard
-              helper="Menunggu koneksi SISTER"
+              helper={sdmCountHelper}
               icon={UsersRound}
               label="SDM terindeks"
-              value="—"
+              value={sdmCountValue}
             />
             <StatCard
               helper="Belum ada operasi eksternal"
