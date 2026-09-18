@@ -25,16 +25,7 @@ export function RiwayatPekerjaanDetailPage({
 
   return (
     <PageShell
-      actions={
-        <>
-          {detailQuery.data?.source && (
-            <StatusBadge tone={detailQuery.data.source === "sister" ? "success" : "warning"}>
-              {detailQuery.data.source === "sister" ? "SISTER" : "Fixture mode"}
-            </StatusBadge>
-          )}
-          <StatusBadge tone="neutral">Read-only</StatusBadge>
-        </>
-      }
+      actions={<StatusBadge tone="neutral">Read-only</StatusBadge>}
       activeLabel="Riwayat Pekerjaan"
       breadcrumb={[
         { href: "/", label: "Ikhtisar" },

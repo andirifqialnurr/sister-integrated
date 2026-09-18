@@ -6,7 +6,6 @@ import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/component/ui/button";
 import { PageShell } from "@/component/ui/page_shell";
 import { State } from "@/component/ui/state";
-import { StatusBadge } from "@/component/ui/status_badge";
 import { useTRPC } from "@/lib/trpc";
 
 import { ProfilPtWidget } from "../widget/profil_pt_widget";
@@ -58,7 +57,6 @@ export function ReferensiPage() {
           <PanelHeader
             description="GET /referensi/profil_pt - tanpa parameter"
             icon={<Building2 aria-hidden size={17} />}
-            source={profilPtQuery.data?.source}
             title="Profil perguruan tinggi"
           />
           <div className="p-5">
@@ -85,7 +83,6 @@ export function ReferensiPage() {
           <PanelHeader
             description="GET /referensi/semester - tanpa parameter"
             icon={<CalendarDays aria-hidden size={17} />}
-            source={semesterQuery.data?.source}
             title="Semester"
           />
           <div className="p-5">
@@ -126,12 +123,10 @@ export function ReferensiPage() {
 function PanelHeader({
   description,
   icon,
-  source,
   title,
 }: {
   description: string;
   icon: React.ReactNode;
-  source?: "fixture" | "sister";
   title: string;
 }) {
   return (
@@ -141,22 +136,11 @@ function PanelHeader({
           {icon}
         </div>
         <div className="min-w-0">
-          <div className="flex flex-wrap items-center gap-2">
-            <h2 className="text-sm font-bold text-[hsl(var(--color-text))]">{title}</h2>
-            {source && <SourceBadge source={source} />}
-          </div>
+          <h2 className="text-sm font-bold text-[hsl(var(--color-text))]">{title}</h2>
           <p className="mt-1 text-xs text-[hsl(var(--color-muted))]">{description}</p>
         </div>
       </div>
     </div>
-  );
-}
-
-function SourceBadge({ source }: { source: "fixture" | "sister" }) {
-  return (
-    <StatusBadge tone={source === "sister" ? "success" : "warning"}>
-      {source === "sister" ? "SISTER" : "Fixture mode"}
-    </StatusBadge>
   );
 }
 

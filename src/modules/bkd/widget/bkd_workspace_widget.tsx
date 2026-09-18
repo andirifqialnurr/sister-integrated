@@ -7,7 +7,6 @@ import { BarChart3, SlidersHorizontal } from "lucide-react";
 
 import { Select } from "@/component/ui/select";
 import { State } from "@/component/ui/state";
-import { StatusBadge } from "@/component/ui/status_badge";
 import { Tabs } from "@/component/ui/tabs";
 import { useTRPC } from "@/lib/trpc";
 
@@ -28,63 +27,52 @@ const activityTabs = [
 type ActivityKey = (typeof activityTabs)[number]["key"];
 
 type BkdWorkspaceWidgetProps = {
-  sdmId?: string;
+  sdmId: string;
 };
 
-export function BkdWorkspaceWidget({ sdmId }: BkdWorkspaceWidgetProps = {}) {
+export function BkdWorkspaceWidget({ sdmId }: BkdWorkspaceWidgetProps) {
   const trpc = useTRPC();
-  const [pickedSdmId, setPickedSdmId] = useState("");
   const [selectedSemesterId, setSelectedSemesterId] = useState("");
   const [activeTab, setActiveTab] = useState<ActivityKey>("pendidikan");
-  const effectiveSdmId = sdmId ?? pickedSdmId;
-  const hasSelection = Boolean(effectiveSdmId && selectedSemesterId);
+  const hasSelection = Boolean(sdmId && selectedSemesterId);
 
-  const pegawaiQuery = useQuery({
-    ...trpc.pegawai.search.queryOptions({
-      search_by: "nama",
-      search: "",
-      page: 1,
-      per_page: 50,
-    }),
-    enabled: !sdmId,
-  });
   const semesterQuery = useQuery(trpc.referensi.get_semester.queryOptions({}));
 
   const laporanQuery = useQuery({
-    ...trpc.bkd.laporan_akhir.queryOptions({ id_sdm: effectiveSdmId || emptySdmId }),
-    enabled: Boolean(effectiveSdmId),
+    ...trpc.bkd.laporan_akhir.queryOptions({ id_sdm: sdmId || emptySdmId }),
+    enabled: Boolean(sdmId),
   });
   const pendidikanQuery = useQuery({
     ...trpc.bkd.pendidikan.queryOptions({
-      id_sdm: effectiveSdmId || emptySdmId,
+      id_sdm: sdmId || emptySdmId,
       id_smt: selectedSemesterId || emptySemesterId,
     }),
     enabled: hasSelection && activeTab === "pendidikan",
   });
   const ajarQuery = useQuery({
     ...trpc.bkd.ajar.queryOptions({
-      id_sdm: effectiveSdmId || emptySdmId,
+      id_sdm: sdmId || emptySdmId,
       id_smt: selectedSemesterId || emptySemesterId,
     }),
     enabled: hasSelection && activeTab === "ajar",
   });
   const tunjangQuery = useQuery({
     ...trpc.bkd.tunjang.queryOptions({
-      id_sdm: effectiveSdmId || emptySdmId,
+      id_sdm: sdmId || emptySdmId,
       id_smt: selectedSemesterId || emptySemesterId,
     }),
     enabled: hasSelection && activeTab === "tunjang",
   });
   const pengmasQuery = useQuery({
     ...trpc.bkd.pengmas.queryOptions({
-      id_sdm: effectiveSdmId || emptySdmId,
+      id_sdm: sdmId || emptySdmId,
       id_smt: selectedSemesterId || emptySemesterId,
     }),
     enabled: hasSelection && activeTab === "pengmas",
   });
   const penelitianQuery = useQuery({
     ...trpc.bkd.penelitian.queryOptions({
-      id_sdm: effectiveSdmId || emptySdmId,
+      id_sdm: sdmId || emptySdmId,
       id_smt: selectedSemesterId || emptySemesterId,
     }),
     enabled: hasSelection && activeTab === "penelitian",
@@ -97,29 +85,10 @@ export function BkdWorkspaceWidget({ sdmId }: BkdWorkspaceWidgetProps = {}) {
     pengmas: pengmasQuery,
     penelitian: penelitianQuery,
   }[activeTab];
-  const selectedPegawai = pegawaiQuery.data?.items.find(
-    (item) => item.id_sdm === effectiveSdmId,
-  );
 
   return (
     <section className="space-y-6">
-      <div className="flex flex-col items-stretch gap-3 md:flex-row md:items-center md:justify-end">
-        {!sdmId && pegawaiQuery.data?.source && <SourceBadge source={pegawaiQuery.data.source} />}
-        {!sdmId && (
-          <Select
-            ariaLabel="Pilih pegawai untuk BKD"
-            disabled={pegawaiQuery.isPending || pegawaiQuery.isError}
-            onValueChange={setPickedSdmId}
-            options={[
-              { label: "Pilih pegawai", value: "" },
-              ...(pegawaiQuery.data?.items.map((item) => ({
-                label: `${item.nama_sdm}${item.nidn ? ` - ${item.nidn}` : ""}`,
-                value: item.id_sdm,
-              })) ?? []),
-            ]}
-            value={pickedSdmId}
-          />
-        )}
+      <div className="flex flex-col items-stretch gap-3 sm:flex-row sm:items-center sm:justify-end">
         <Select
           ariaLabel="Pilih semester"
           disabled={semesterQuery.isPending || semesterQuery.isError}
@@ -133,24 +102,15 @@ export function BkdWorkspaceWidget({ sdmId }: BkdWorkspaceWidgetProps = {}) {
           ]}
           value={selectedSemesterId}
         />
-        {((!sdmId && pegawaiQuery.isPending) || semesterQuery.isPending) && (
-          <p className="text-xs text-[hsl(var(--color-muted))]">Memuat pilihan...</p>
-        )}
-        {!sdmId && selectedPegawai && selectedSemesterId && (
-          <p className="text-xs text-[hsl(var(--color-muted))]">
-            Konteks aktif:{" "}
-            <span className="font-semibold text-[hsl(var(--color-text))]">
-              {selectedPegawai.nama_sdm}
-            </span>{" "}
-            - semester {selectedSemesterId}
-          </p>
+        {semesterQuery.isPending && (
+          <p className="text-xs text-[hsl(var(--color-muted))]">Memuat semester...</p>
         )}
       </div>
 
-      {((!sdmId && pegawaiQuery.isError) || semesterQuery.isError) && (
+      {semesterQuery.isError && (
         <State
           description="Periksa session dan koneksi SISTER."
-          title="Pilihan SDM atau semester belum dapat dimuat"
+          title="Pilihan semester belum dapat dimuat"
           tone="error"
         />
       )}
@@ -159,7 +119,7 @@ export function BkdWorkspaceWidget({ sdmId }: BkdWorkspaceWidgetProps = {}) {
           description={
             sdmId
               ? "Data BKD akan dimuat setelah semester dipilih."
-              : "Data BKD akan dimuat setelah kedua referensi dipilih."
+              : "Data BKD akan dimuat setelah SDM dan semester dipilih."
           }
           icon={<SlidersHorizontal aria-hidden size={18} />}
           title={sdmId ? "Pilih semester terlebih dahulu" : "Pilih SDM dan semester terlebih dahulu"}
@@ -171,7 +131,6 @@ export function BkdWorkspaceWidget({ sdmId }: BkdWorkspaceWidgetProps = {}) {
           <section className="space-y-4">
             <PanelHeading
               description="GET /bkd/laporan_akhir_bkd - berdasarkan id_sdm"
-              source={laporanQuery.data?.source}
               title="Laporan akhir BKD"
             />
             {laporanQuery.isPending && (
@@ -192,7 +151,6 @@ export function BkdWorkspaceWidget({ sdmId }: BkdWorkspaceWidgetProps = {}) {
             <div className="border-b border-[hsl(var(--color-border))] p-5">
               <PanelHeading
                 description={`GET /bkd/${activeTab} - id_sdm + id_smt`}
-                source={activityQuery.data?.source}
                 title="Aktivitas BKD"
               />
             </div>
@@ -229,23 +187,7 @@ export function BkdWorkspaceWidget({ sdmId }: BkdWorkspaceWidgetProps = {}) {
   );
 }
 
-function SourceBadge({ source }: { source: "fixture" | "sister" }) {
-  return (
-    <StatusBadge tone={source === "sister" ? "success" : "warning"}>
-      {source === "sister" ? "SISTER" : "Fixture mode"}
-    </StatusBadge>
-  );
-}
-
-function PanelHeading({
-  description,
-  source,
-  title,
-}: {
-  description: string;
-  source?: "fixture" | "sister";
-  title: string;
-}) {
+function PanelHeading({ description, title }: { description: string; title: string }) {
   return (
     <div className="flex items-start justify-between gap-4">
       <div className="flex items-start gap-3">
@@ -253,10 +195,7 @@ function PanelHeading({
           <BarChart3 aria-hidden size={17} />
         </div>
         <div>
-          <div className="flex flex-wrap items-center gap-2">
-            <h2 className="text-sm font-bold text-[hsl(var(--color-text))]">{title}</h2>
-            {source && <SourceBadge source={source} />}
-          </div>
+          <h2 className="text-sm font-bold text-[hsl(var(--color-text))]">{title}</h2>
           <p className="mt-1 text-xs text-[hsl(var(--color-muted))]">{description}</p>
         </div>
       </div>
