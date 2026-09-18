@@ -6,6 +6,7 @@ import { useQuery } from "@tanstack/react-query";
 import { ClipboardList } from "lucide-react";
 
 import { Select } from "@/component/ui/select";
+import { State } from "@/component/ui/state";
 import { StatusBadge } from "@/component/ui/status_badge";
 import { useTRPC } from "@/lib/trpc";
 
@@ -64,15 +65,27 @@ export function PenugasanWorkspaceWidget() {
       </div>
 
       {pegawaiQuery.isError && (
-        <ErrorState label="Daftar pegawai belum dapat dimuat. Periksa session dan koneksi SISTER." />
+        <State
+          description="Periksa session dan koneksi SISTER."
+          title="Daftar pegawai belum dapat dimuat"
+          tone="error"
+        />
       )}
-      {!selectedSdmId && <SelectionState />}
-      {selectedSdmId && penugasanQuery.isPending && <LoadingState />}
+      {!selectedSdmId && (
+        <State
+          description="Data penugasan akan dimuat setelah SDM dipilih."
+          icon={<ClipboardList aria-hidden size={18} />}
+          title="Pilih pegawai terlebih dahulu"
+        />
+      )}
+      {selectedSdmId && penugasanQuery.isPending && (
+        <State description="Mohon tunggu sebentar." title="Memuat penugasan..." tone="loading" />
+      )}
       {selectedSdmId && penugasanQuery.isError && (
-        <ErrorState label="Daftar penugasan belum dapat dimuat." />
+        <State title="Daftar penugasan belum dapat dimuat" tone="error" />
       )}
       {selectedSdmId && penugasanQuery.data?.items.length === 0 && (
-        <EmptyState label="Belum ada penugasan untuk pegawai ini." />
+        <State description="Belum ada penugasan untuk pegawai ini." title="Belum ada penugasan" />
       )}
       {penugasanQuery.data && penugasanQuery.data.items.length > 0 && (
         <section className="space-y-3">
@@ -99,45 +112,5 @@ function SourceBadge({ source }: { source: "fixture" | "sister" }) {
     <StatusBadge tone={source === "sister" ? "success" : "warning"}>
       {source === "sister" ? "SISTER" : "Fixture mode"}
     </StatusBadge>
-  );
-}
-
-function SelectionState() {
-  return (
-    <div className="rounded-xl border border-dashed border-[hsl(var(--color-border))] bg-white p-10 text-center">
-      <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-full bg-[hsl(var(--color-primary-soft))] text-[hsl(var(--color-primary))]">
-        <ClipboardList aria-hidden size={18} />
-      </div>
-      <p className="mt-3 text-sm font-semibold text-[hsl(var(--color-text))]">
-        Pilih pegawai terlebih dahulu
-      </p>
-      <p className="mt-1 text-xs text-[hsl(var(--color-muted))]">
-        Data penugasan akan dimuat setelah SDM dipilih.
-      </p>
-    </div>
-  );
-}
-
-function LoadingState() {
-  return (
-    <div className="rounded-xl border border-[hsl(var(--color-border))] bg-white p-10 text-center text-sm text-[hsl(var(--color-muted))]">
-      Memuat penugasan...
-    </div>
-  );
-}
-
-function ErrorState({ label }: { label: string }) {
-  return (
-    <div className="rounded-xl border border-[hsl(var(--color-danger))]/30 bg-[hsl(var(--color-danger-soft))] p-5 text-sm text-[hsl(var(--color-danger-strong))]">
-      {label}
-    </div>
-  );
-}
-
-function EmptyState({ label }: { label: string }) {
-  return (
-    <div className="rounded-xl border border-dashed border-[hsl(var(--color-border))] bg-white p-10 text-center text-sm text-[hsl(var(--color-muted))]">
-      {label}
-    </div>
   );
 }

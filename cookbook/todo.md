@@ -241,6 +241,33 @@ DELETE, pagination, dan binary download belum dibuka.
 - [ ] Response live Riwayat Pekerjaan belum diuji karena credential dan UAT
       belum tersedia.
 
+## UI state standardization checkpoint: 2026-09-18
+
+Checkpoint ini melanjutkan item "Bedakan loading, empty, error, unauthorized,
+dan stale cache" pada MVP read-only. Cakupannya hanya konsistensi visual dan
+semantic tone, bukan stale cache indicator.
+
+- [x] Primitive `State` (`src/component/ui/state.tsx`) menambah prop `icon`
+      opsional untuk selection/empty state yang sebelumnya memakai markup ad
+      hoc.
+- [x] Widget dan halaman berikut memakai `State` untuk loading/empty/error,
+      menggantikan `div` ad hoc yang sebelumnya berbeda-beda per module:
+      `pegawai_search_widget`, `pegawai_detail_page`, `bkd_workspace_widget`,
+      `pendidikan_formal_workspace_widget`, `pendidikan_formal_detail_page`,
+      `penugasan_workspace_widget`, `penugasan_detail_page`, `referensi_page`,
+      `riwayat_pekerjaan_workspace_widget`, `riwayat_pekerjaan_detail_page`,
+      `security_audit_page`.
+- [x] Error tRPC dengan code `UNAUTHORIZED`/`FORBIDDEN` pada
+      `pendidikan_formal`, `riwayat_pekerjaan`, dan `security.audit_list`
+      memakai tone `forbidden` yang berbeda secara visual dari error umum;
+      `NOT_FOUND` memakai tone `unavailable`.
+- [x] `bun run typecheck` dan `bun run lint` lulus setelah refactor.
+- [ ] Stale cache belum memiliki indikator UI; query hanya memakai
+      `staleTime` 60 detik pada `src/lib/trpc.tsx` tanpa badge atau pesan yang
+      terlihat pengguna.
+- [ ] Browser QA light/dark pada breakpoint 1280/1024/390/320 belum
+      dilakukan untuk perubahan ini.
+
 ## 0. Gate kontrak eksternal
 
 - [ ] Identifikasi perguruan tinggi target dan instance SISTER yang akan dipakai.

@@ -10,6 +10,7 @@ type StateProps = {
   tone?: StateTone;
   action?: ReactNode;
   children?: ReactNode;
+  icon?: ReactNode;
   className?: string;
 };
 
@@ -27,6 +28,7 @@ export function State({
   tone = "empty",
   action,
   children,
+  icon,
   className,
 }: StateProps) {
   const isLoading = tone === "loading";
@@ -38,6 +40,11 @@ export function State({
       className={cn("rounded-xl border p-10 text-center", toneClasses[tone], className)}
       role={isLoading ? "status" : "region"}
     >
+      {icon && (
+        <div className="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-[hsl(var(--color-primary-soft))] text-[hsl(var(--color-primary))]">
+          {icon}
+        </div>
+      )}
       <p className="text-sm font-semibold text-[hsl(var(--color-text))]">{title}</p>
       {description && (
         <p className="mx-auto mt-1 max-w-xl text-xs text-[hsl(var(--color-muted))]">

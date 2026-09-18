@@ -7,6 +7,7 @@ import { Search } from "lucide-react";
 
 import { Button } from "@/component/ui/button";
 import { Select } from "@/component/ui/select";
+import { State } from "@/component/ui/state";
 import { StatusBadge } from "@/component/ui/status_badge";
 import { useTRPC } from "@/lib/trpc";
 
@@ -78,16 +79,24 @@ export function PegawaiSearchWidget() {
       </div>
 
       {pegawaiQuery.isPending && (
-        <div className="rounded-xl border border-[hsl(var(--color-border))] bg-white p-10 text-center text-sm text-[hsl(var(--color-muted))]">
-          Memuat daftar pegawai...
-        </div>
+        <State
+          description="Mohon tunggu sebentar."
+          title="Memuat daftar pegawai..."
+          tone="loading"
+        />
       )}
 
       {pegawaiQuery.isError && (
-        <div className="rounded-xl border border-[hsl(var(--color-danger))]/30 bg-[hsl(var(--color-danger-soft))] p-5 text-sm text-[hsl(var(--color-danger-strong))]">
-          Daftar pegawai belum dapat dimuat. Coba lagi setelah konfigurasi
-          session dan koneksi SISTER diperiksa.
-        </div>
+        <State
+          action={
+            <Button onClick={() => void pegawaiQuery.refetch()} size="sm">
+              Coba lagi
+            </Button>
+          }
+          description="Coba lagi setelah konfigurasi session dan koneksi SISTER diperiksa."
+          title="Daftar pegawai belum dapat dimuat"
+          tone="error"
+        />
       )}
 
       {pegawaiQuery.data && (
@@ -103,14 +112,10 @@ export function PegawaiSearchWidget() {
           {pegawaiQuery.data.items.length > 0 ? (
             <PegawaiResultsTable items={pegawaiQuery.data.items} />
           ) : (
-            <div className="rounded-xl border border-dashed border-[hsl(var(--color-border))] bg-white p-10 text-center">
-              <p className="text-sm font-semibold text-[hsl(var(--color-text))]">
-                Pegawai tidak ditemukan
-              </p>
-              <p className="mt-1 text-xs text-[hsl(var(--color-muted))]">
-                Ubah kata kunci atau pilih jenis identifier lain.
-              </p>
-            </div>
+            <State
+              description="Ubah kata kunci atau pilih jenis identifier lain."
+              title="Pegawai tidak ditemukan"
+            />
           )}
         </>
       )}

@@ -5,6 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 
 import { Button } from "@/component/ui/button";
 import { PageShell } from "@/component/ui/page_shell";
+import { State } from "@/component/ui/state";
 import { StatusBadge } from "@/component/ui/status_badge";
 import { useTRPC } from "@/lib/trpc";
 
@@ -60,12 +61,18 @@ export function ReferensiPage() {
             title="Profil perguruan tinggi"
           />
           <div className="p-5">
-            {profilPtQuery.isPending && <LoadingState label="Memuat profil PT..." />}
+            {profilPtQuery.isPending && (
+              <State description="Mohon tunggu sebentar." title="Memuat profil PT..." tone="loading" />
+            )}
             {profilPtQuery.isError && (
-              <ErrorState label="Profil PT belum dapat dimuat. Periksa session dan koneksi SISTER." />
+              <State
+                description="Periksa session dan koneksi SISTER."
+                title="Profil PT belum dapat dimuat"
+                tone="error"
+              />
             )}
             {profilPtQuery.data && profilPtQuery.data.items.length === 0 && (
-              <EmptyState label="Profil PT tidak tersedia dari response SISTER." />
+              <State description="Profil PT tidak tersedia dari response SISTER." title="Belum ada profil PT" />
             )}
             {profilPtQuery.data && profilPtQuery.data.items.length > 0 && (
               <ProfilPtWidget items={profilPtQuery.data.items} />
@@ -81,12 +88,18 @@ export function ReferensiPage() {
             title="Semester"
           />
           <div className="p-5">
-            {semesterQuery.isPending && <LoadingState label="Memuat semester..." />}
+            {semesterQuery.isPending && (
+              <State description="Mohon tunggu sebentar." title="Memuat semester..." tone="loading" />
+            )}
             {semesterQuery.isError && (
-              <ErrorState label="Semester belum dapat dimuat. Periksa session dan koneksi SISTER." />
+              <State
+                description="Periksa session dan koneksi SISTER."
+                title="Semester belum dapat dimuat"
+                tone="error"
+              />
             )}
             {semesterQuery.data && semesterQuery.data.items.length === 0 && (
-              <EmptyState label="Belum ada semester pada response SISTER." />
+              <State description="Belum ada semester pada response SISTER." title="Belum ada semester" />
             )}
             {semesterQuery.data && semesterQuery.data.items.length > 0 && (
               <SemesterTable items={semesterQuery.data.items} />
@@ -135,22 +148,3 @@ function SourceBadge({ source }: { source: "fixture" | "sister" }) {
   );
 }
 
-function LoadingState({ label }: { label: string }) {
-  return <p className="py-10 text-center text-sm text-[hsl(var(--color-muted))]">{label}</p>;
-}
-
-function ErrorState({ label }: { label: string }) {
-  return (
-    <div className="rounded-lg border border-[hsl(var(--color-danger))]/30 bg-[hsl(var(--color-danger-soft))] p-4 text-sm text-[hsl(var(--color-danger-strong))]">
-      {label}
-    </div>
-  );
-}
-
-function EmptyState({ label }: { label: string }) {
-  return (
-    <div className="rounded-lg border border-dashed border-[hsl(var(--color-border))] bg-[hsl(var(--color-canvas))] p-8 text-center text-sm text-[hsl(var(--color-muted))]">
-      {label}
-    </div>
-  );
-}

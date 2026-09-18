@@ -6,6 +6,7 @@ import { useQuery } from "@tanstack/react-query";
 import { GraduationCap } from "lucide-react";
 
 import { Select } from "@/component/ui/select";
+import { State } from "@/component/ui/state";
 import { StatusBadge } from "@/component/ui/status_badge";
 import { useTRPC } from "@/lib/trpc";
 
@@ -64,18 +65,26 @@ export function PendidikanFormalWorkspaceWidget() {
       </div>
 
       {pegawaiQuery.isError && (
-        <ErrorState code={pegawaiQuery.error?.data?.code} label="Daftar pegawai belum dapat dimuat." />
+        <StateFromCode code={pegawaiQuery.error?.data?.code} label="Daftar pegawai belum dapat dimuat." />
       )}
-      {!selectedSdmId && <SelectionState />}
-      {selectedSdmId && pendidikanFormalQuery.isPending && <LoadingState />}
+      {!selectedSdmId && (
+        <State
+          description="Data pendidikan formal akan dimuat setelah SDM dipilih."
+          icon={<GraduationCap aria-hidden size={18} />}
+          title="Pilih pegawai terlebih dahulu"
+        />
+      )}
+      {selectedSdmId && pendidikanFormalQuery.isPending && (
+        <State description="Mohon tunggu sebentar." title="Memuat pendidikan formal..." tone="loading" />
+      )}
       {selectedSdmId && pendidikanFormalQuery.isError && (
-        <ErrorState
+        <StateFromCode
           code={pendidikanFormalQuery.error?.data?.code}
           label="Daftar pendidikan formal belum dapat dimuat."
         />
       )}
       {selectedSdmId && pendidikanFormalQuery.data?.items.length === 0 && (
-        <EmptyState label="Belum ada pendidikan formal untuk pegawai ini." />
+        <State description="Belum ada pendidikan formal untuk pegawai ini." title="Belum ada pendidikan formal" />
       )}
       {pendidikanFormalQuery.data && pendidikanFormalQuery.data.items.length > 0 && (
         <section className="space-y-3">
@@ -105,51 +114,25 @@ function SourceBadge({ source }: { source: "fixture" | "sister" }) {
   );
 }
 
-function SelectionState() {
-  return (
-    <div className="rounded-xl border border-dashed border-[hsl(var(--color-border))] bg-white p-10 text-center">
-      <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-full bg-[hsl(var(--color-primary-soft))] text-[hsl(var(--color-primary))]">
-        <GraduationCap aria-hidden size={18} />
-      </div>
-      <p className="mt-3 text-sm font-semibold text-[hsl(var(--color-text))]">
-        Pilih pegawai terlebih dahulu
-      </p>
-      <p className="mt-1 text-xs text-[hsl(var(--color-muted))]">
-        Data pendidikan formal akan dimuat setelah SDM dipilih.
-      </p>
-    </div>
-  );
-}
-
-function LoadingState() {
-  return (
-    <div className="rounded-xl border border-[hsl(var(--color-border))] bg-white p-10 text-center text-sm text-[hsl(var(--color-muted))]">
-      Memuat pendidikan formal...
-    </div>
-  );
-}
-
-function ErrorState({ code, label }: { code?: string; label: string }) {
-  const message =
-    code === "UNAUTHORIZED"
-      ? "Session diperlukan untuk membaca data ini."
-      : code === "FORBIDDEN"
-        ? "Session tidak memiliki akses ke data ini."
-        : code === "NOT_FOUND"
-          ? "Data pendidikan formal tidak ditemukan."
-          : label;
-
-  return (
-    <div className="rounded-lg border border-[hsl(var(--color-danger))]/30 bg-[hsl(var(--color-danger-soft))] p-4 text-sm text-[hsl(var(--color-danger-strong))]">
-      {message}
-    </div>
-  );
-}
-
-function EmptyState({ label }: { label: string }) {
-  return (
-    <div className="rounded-xl border border-dashed border-[hsl(var(--color-border))] bg-white p-10 text-center text-sm text-[hsl(var(--color-muted))]">
-      {label}
-    </div>
-  );
+function StateFromCode({ code, label }: { code?: string; label: string }) {
+  if (code === "UNAUTHORIZED") {
+    return (
+      <State description="Session diperlukan untuk membaca data ini." title="Akses ditolak" tone="forbidden" />
+    );
+  }
+  if (code === "FORBIDDEN") {
+    return (
+      <State
+        description="Session tidak memiliki akses ke data ini."
+        title="Akses ditolak"
+        tone="forbidden"
+      />
+    );
+  }
+  if (code === "NOT_FOUND") {
+    return (
+      <State description="Data pendidikan formal tidak ditemukan." title="Data tidak ditemukan" tone="unavailable" />
+    );
+  }
+  return <State title={label} tone="error" />;
 }

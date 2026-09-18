@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
 
 import { PageShell } from "@/component/ui/page_shell";
+import { State } from "@/component/ui/state";
 import { StatusBadge } from "@/component/ui/status_badge";
 import { useTRPC } from "@/lib/trpc";
 
@@ -31,16 +32,22 @@ export function PenugasanDetailPage() {
       detailLabel={detailQuery.data?.item.unit_kerja ?? "penugasan"}
     >
           {detailQuery.isPending && (
-            <div className="rounded-xl border border-[hsl(var(--color-border))] bg-white p-10 text-center text-sm text-[hsl(var(--color-muted))]">
-              Memuat detail penugasan...
-            </div>
+            <State description="Mohon tunggu sebentar." title="Memuat detail penugasan..." tone="loading" />
           )}
           {detailQuery.isError && (
-            <div className="rounded-xl border border-[hsl(var(--color-danger))]/30 bg-[hsl(var(--color-danger-soft))] p-5 text-sm text-[hsl(var(--color-danger-strong))]">
-              {errorCode === "NOT_FOUND"
-                ? "Penugasan tidak ditemukan atau sudah tidak tersedia."
-                : "Detail penugasan belum dapat dimuat. Periksa session dan koneksi SISTER."}
-            </div>
+            <State
+              title={
+                errorCode === "NOT_FOUND"
+                  ? "Penugasan tidak ditemukan"
+                  : "Detail penugasan belum dapat dimuat"
+              }
+              description={
+                errorCode === "NOT_FOUND"
+                  ? "Penugasan tidak ditemukan atau sudah tidak tersedia."
+                  : "Periksa session dan koneksi SISTER."
+              }
+              tone={errorCode === "NOT_FOUND" ? "unavailable" : "error"}
+            />
           )}
           {detailQuery.data && (
             <PenugasanDetailWidget item={detailQuery.data.item} />

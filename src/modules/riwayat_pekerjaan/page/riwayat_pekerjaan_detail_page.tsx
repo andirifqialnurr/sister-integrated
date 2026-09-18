@@ -3,6 +3,7 @@
 import { useQuery } from "@tanstack/react-query";
 
 import { PageShell } from "@/component/ui/page_shell";
+import { State } from "@/component/ui/state";
 import { StatusBadge } from "@/component/ui/status_badge";
 import { useTRPC } from "@/lib/trpc";
 
@@ -43,16 +44,19 @@ export function RiwayatPekerjaanDetailPage({
       maxWidth="1100px"
     >
           {detailQuery.isPending && (
-            <div className="rounded-xl border border-[hsl(var(--color-border))] bg-white p-10 text-center text-sm text-[hsl(var(--color-muted))]">
-              Memuat detail riwayat pekerjaan...
-            </div>
+            <State
+              description="Mohon tunggu sebentar."
+              title="Memuat detail riwayat pekerjaan..."
+              tone="loading"
+            />
           )}
 
           {detailQuery.isError && (
-            <div className="rounded-xl border border-[hsl(var(--color-danger))]/30 bg-[hsl(var(--color-danger-soft))] p-5 text-sm text-[hsl(var(--color-danger-strong))]">
-              Detail riwayat pekerjaan tidak dapat dimuat. Pastikan ID berasal dari hasil
-              list dan session memiliki akses read-only.
-            </div>
+            <State
+              description="Pastikan ID berasal dari hasil list dan session memiliki akses read-only."
+              title="Detail riwayat pekerjaan tidak dapat dimuat"
+              tone="error"
+            />
           )}
 
           {detailQuery.data && (

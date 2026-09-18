@@ -6,6 +6,7 @@ import { useQuery } from "@tanstack/react-query";
 import { BarChart3, SlidersHorizontal } from "lucide-react";
 
 import { Select } from "@/component/ui/select";
+import { State } from "@/component/ui/state";
 import { StatusBadge } from "@/component/ui/status_badge";
 import { cn } from "@/lib/cn";
 import { useTRPC } from "@/lib/trpc";
@@ -139,9 +140,19 @@ export function BkdWorkspaceWidget() {
       </div>
 
       {(pegawaiQuery.isError || semesterQuery.isError) && (
-        <ErrorState label="Pilihan SDM atau semester belum dapat dimuat. Periksa session dan koneksi SISTER." />
+        <State
+          description="Periksa session dan koneksi SISTER."
+          title="Pilihan SDM atau semester belum dapat dimuat"
+          tone="error"
+        />
       )}
-      {!hasSelection && <SelectionState />}
+      {!hasSelection && (
+        <State
+          description="Data BKD akan dimuat setelah kedua referensi dipilih."
+          icon={<SlidersHorizontal aria-hidden size={18} />}
+          title="Pilih SDM dan semester terlebih dahulu"
+        />
+      )}
 
       {hasSelection && (
         <>
@@ -151,10 +162,14 @@ export function BkdWorkspaceWidget() {
               source={laporanQuery.data?.source}
               title="Laporan akhir BKD"
             />
-            {laporanQuery.isPending && <LoadingState label="Memuat laporan akhir BKD..." />}
-            {laporanQuery.isError && <ErrorState label="Laporan akhir BKD belum dapat dimuat." />}
+            {laporanQuery.isPending && (
+              <State description="Mohon tunggu sebentar." title="Memuat laporan akhir BKD..." tone="loading" />
+            )}
+            {laporanQuery.isError && (
+              <State title="Laporan akhir BKD belum dapat dimuat" tone="error" />
+            )}
             {laporanQuery.data && laporanQuery.data.items.length === 0 && (
-              <EmptyState label="Belum ada laporan akhir BKD untuk SDM ini." />
+              <State description="Belum ada laporan akhir BKD untuk SDM ini." title="Belum ada laporan akhir BKD" />
             )}
             {laporanQuery.data && laporanQuery.data.items.length > 0 && (
               <BkdSummaryWidget items={laporanQuery.data.items} />
@@ -189,10 +204,18 @@ export function BkdWorkspaceWidget() {
               </div>
             </div>
             <div className="p-5">
-              {activityQuery.isPending && <LoadingState label={`Memuat data ${activeTab}...`} />}
-              {activityQuery.isError && <ErrorState label="Aktivitas BKD belum dapat dimuat." />}
+              {activityQuery.isPending && (
+                <State
+                  description="Mohon tunggu sebentar."
+                  title={`Memuat data ${activeTab}...`}
+                  tone="loading"
+                />
+              )}
+              {activityQuery.isError && (
+                <State title="Aktivitas BKD belum dapat dimuat" tone="error" />
+              )}
               {activityQuery.data && activityQuery.data.items.length === 0 && (
-                <EmptyState label="Belum ada aktivitas pada semester ini." />
+                <State description="Belum ada aktivitas pada semester ini." title="Belum ada aktivitas" />
               )}
               {activityQuery.data && activityQuery.data.items.length > 0 && (
                 <BkdActivityTable items={activityQuery.data.items} />
@@ -236,46 +259,6 @@ function PanelHeading({
           <p className="mt-1 text-xs text-[hsl(var(--color-muted))]">{description}</p>
         </div>
       </div>
-    </div>
-  );
-}
-
-function SelectionState() {
-  return (
-    <div className="rounded-xl border border-dashed border-[hsl(var(--color-border))] bg-white p-10 text-center">
-      <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-full bg-[hsl(var(--color-primary-soft))] text-[hsl(var(--color-primary))]">
-        <SlidersHorizontal aria-hidden size={18} />
-      </div>
-      <p className="mt-3 text-sm font-semibold text-[hsl(var(--color-text))]">
-        Pilih SDM dan semester terlebih dahulu
-      </p>
-      <p className="mt-1 text-xs text-[hsl(var(--color-muted))]">
-        Data BKD akan dimuat setelah kedua referensi dipilih.
-      </p>
-    </div>
-  );
-}
-
-function LoadingState({ label }: { label: string }) {
-  return (
-    <div className="rounded-xl border border-[hsl(var(--color-border))] bg-white p-10 text-center text-sm text-[hsl(var(--color-muted))]">
-      {label}
-    </div>
-  );
-}
-
-function ErrorState({ label }: { label: string }) {
-  return (
-    <div className="rounded-xl border border-[hsl(var(--color-danger))]/30 bg-[hsl(var(--color-danger-soft))] p-5 text-sm text-[hsl(var(--color-danger-strong))]">
-      {label}
-    </div>
-  );
-}
-
-function EmptyState({ label }: { label: string }) {
-  return (
-    <div className="rounded-xl border border-dashed border-[hsl(var(--color-border))] bg-white p-10 text-center text-sm text-[hsl(var(--color-muted))]">
-      {label}
     </div>
   );
 }
