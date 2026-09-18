@@ -10,6 +10,7 @@ import { State } from "@/component/ui/state";
 import { StatusBadge } from "@/component/ui/status_badge";
 import { Tabs, type TabItem } from "@/component/ui/tabs";
 import { useTRPC } from "@/lib/trpc";
+import { BkdSemesterPicker } from "@/modules/bkd/widget/bkd_semester_picker";
 import { BkdWorkspaceWidget } from "@/modules/bkd/widget/bkd_workspace_widget";
 import { PendidikanFormalWorkspaceWidget } from "@/modules/pendidikan_formal/widget/pendidikan_formal_workspace_widget";
 import { PenugasanWorkspaceWidget } from "@/modules/penugasan/widget/penugasan_workspace_widget";
@@ -42,6 +43,7 @@ export function PegawaiDetailPage({ idSdm }: PegawaiDetailPageProps) {
   const trpc = useTRPC();
   const detailQuery = useQuery(trpc.pegawai.get_detail.queryOptions({ id_sdm: idSdm }));
   const [activeTab, setActiveTab] = useState<SdmTabValue>("ringkasan");
+  const [bkdSemesterId, setBkdSemesterId] = useState("");
 
   return (
     <PageShell
@@ -161,7 +163,14 @@ export function PegawaiDetailPage({ idSdm }: PegawaiDetailPageProps) {
                   {activeTab === "riwayat_pekerjaan" && (
                     <RiwayatPekerjaanWorkspaceWidget sdmId={idSdm} />
                   )}
-                  {activeTab === "bkd" && <BkdWorkspaceWidget sdmId={idSdm} />}
+                  {activeTab === "bkd" && (
+                    <div className="space-y-4">
+                      <div className="flex justify-end">
+                        <BkdSemesterPicker onChange={setBkdSemesterId} value={bkdSemesterId} />
+                      </div>
+                      <BkdWorkspaceWidget semesterId={bkdSemesterId} sdmId={idSdm} />
+                    </div>
+                  )}
                 </div>
               </Tabs>
             </>

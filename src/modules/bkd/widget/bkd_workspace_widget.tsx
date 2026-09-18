@@ -5,7 +5,6 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { BarChart3, SlidersHorizontal } from "lucide-react";
 
-import { Select } from "@/component/ui/select";
 import { State } from "@/component/ui/state";
 import { Tabs } from "@/component/ui/tabs";
 import { useTRPC } from "@/lib/trpc";
@@ -28,15 +27,13 @@ type ActivityKey = (typeof activityTabs)[number]["key"];
 
 type BkdWorkspaceWidgetProps = {
   sdmId: string;
+  semesterId: string;
 };
 
-export function BkdWorkspaceWidget({ sdmId }: BkdWorkspaceWidgetProps) {
+export function BkdWorkspaceWidget({ semesterId, sdmId }: BkdWorkspaceWidgetProps) {
   const trpc = useTRPC();
-  const [selectedSemesterId, setSelectedSemesterId] = useState("");
   const [activeTab, setActiveTab] = useState<ActivityKey>("pendidikan");
-  const hasSelection = Boolean(sdmId && selectedSemesterId);
-
-  const semesterQuery = useQuery(trpc.referensi.get_semester.queryOptions({}));
+  const hasSelection = Boolean(sdmId && semesterId);
 
   const laporanQuery = useQuery({
     ...trpc.bkd.laporan_akhir.queryOptions({ id_sdm: sdmId || emptySdmId }),
@@ -45,35 +42,35 @@ export function BkdWorkspaceWidget({ sdmId }: BkdWorkspaceWidgetProps) {
   const pendidikanQuery = useQuery({
     ...trpc.bkd.pendidikan.queryOptions({
       id_sdm: sdmId || emptySdmId,
-      id_smt: selectedSemesterId || emptySemesterId,
+      id_smt: semesterId || emptySemesterId,
     }),
     enabled: hasSelection && activeTab === "pendidikan",
   });
   const ajarQuery = useQuery({
     ...trpc.bkd.ajar.queryOptions({
       id_sdm: sdmId || emptySdmId,
-      id_smt: selectedSemesterId || emptySemesterId,
+      id_smt: semesterId || emptySemesterId,
     }),
     enabled: hasSelection && activeTab === "ajar",
   });
   const tunjangQuery = useQuery({
     ...trpc.bkd.tunjang.queryOptions({
       id_sdm: sdmId || emptySdmId,
-      id_smt: selectedSemesterId || emptySemesterId,
+      id_smt: semesterId || emptySemesterId,
     }),
     enabled: hasSelection && activeTab === "tunjang",
   });
   const pengmasQuery = useQuery({
     ...trpc.bkd.pengmas.queryOptions({
       id_sdm: sdmId || emptySdmId,
-      id_smt: selectedSemesterId || emptySemesterId,
+      id_smt: semesterId || emptySemesterId,
     }),
     enabled: hasSelection && activeTab === "pengmas",
   });
   const penelitianQuery = useQuery({
     ...trpc.bkd.penelitian.queryOptions({
       id_sdm: sdmId || emptySdmId,
-      id_smt: selectedSemesterId || emptySemesterId,
+      id_smt: semesterId || emptySemesterId,
     }),
     enabled: hasSelection && activeTab === "penelitian",
   });
@@ -88,32 +85,6 @@ export function BkdWorkspaceWidget({ sdmId }: BkdWorkspaceWidgetProps) {
 
   return (
     <section className="space-y-6">
-      <div className="flex flex-col items-stretch gap-3 sm:flex-row sm:items-center sm:justify-end">
-        <Select
-          ariaLabel="Pilih semester"
-          disabled={semesterQuery.isPending || semesterQuery.isError}
-          onValueChange={setSelectedSemesterId}
-          options={[
-            { label: "Pilih semester", value: "" },
-            ...(semesterQuery.data?.items.map((item) => ({
-              label: `${item.nama} (${item.id})`,
-              value: String(item.id),
-            })) ?? []),
-          ]}
-          value={selectedSemesterId}
-        />
-        {semesterQuery.isPending && (
-          <p className="text-xs text-[hsl(var(--color-muted))]">Memuat semester...</p>
-        )}
-      </div>
-
-      {semesterQuery.isError && (
-        <State
-          description="Periksa session dan koneksi SISTER."
-          title="Pilihan semester belum dapat dimuat"
-          tone="error"
-        />
-      )}
       {!hasSelection && (
         <State
           description={
