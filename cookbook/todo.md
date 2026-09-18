@@ -371,6 +371,20 @@ masing-masing dengan commit terpisah.
       dipercaya sebagai nilai server-side, bukan input pengguna. DNS
       rebinding protection belum ditambahkan.
 
+## Token provider TTL checkpoint: 2026-09-18
+
+- [x] `src/server/sister/token_provider.test.ts` (baru, 6 test) memverifikasi
+      `getSisterToken` men-cache token dengan `expires_at` sekitar 60 menit
+      ke depan, tidak memanggil `/authorize` ulang selama cache masih valid,
+      men-dedupe pemanggil bersamaan (concurrent) ke satu request
+      `/authorize` yang sama, menolak berjalan pada fixture mode/base_url
+      kosong, dan memetakan error `/authorize` (status non-2xx, body bukan
+      JSON, response tidak sesuai schema) ke `SisterApiError` /
+      `SisterContractError` yang sesuai.
+- [ ] Refresh safety window (60 detik sebelum expiry) belum diuji lewat
+      manipulasi waktu (fake timers); evidence saat ini hanya mencakup path
+      cache-hit dan cache-miss awal.
+
 ## 0. Gate kontrak eksternal
 
 - [ ] Identifikasi perguruan tinggi target dan instance SISTER yang akan dipakai.
@@ -476,7 +490,7 @@ library atau tabel sudah dibuat.
 ## 3. SISTER client dan security boundary
 
 - [ ] Generate tipe dari YAML resmi setelah YAML tersedia.
-- [ ] Implementasikan token provider dengan TTL 60 menit.
+- [x] Implementasikan token provider dengan TTL 60 menit.
 - [ ] Implementasikan POST /authorize di server saja.
 - [ ] Implementasikan header Bearer tanpa mengembalikan token ke browser.
 - [ ] Implementasikan fetch wrapper untuk JSON, multipart, dan binary.
