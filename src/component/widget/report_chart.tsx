@@ -11,19 +11,27 @@ type ReportChartProps = {
   categories: string[];
   series: { name: string; data: number[] }[];
   height?: number;
+  type?: "area" | "bar";
 };
 
-export function ReportChart({ categories, series, height = 260 }: ReportChartProps) {
+export function ReportChart({
+  categories,
+  series,
+  height = 280,
+  type = "area",
+}: ReportChartProps) {
   const options: ApexOptions = {
     chart: {
       toolbar: { show: false },
       fontFamily: theme.typography.sans,
       zoom: { enabled: false },
+      animations: { enabled: false },
     },
     colors: [...theme.chart],
     dataLabels: { enabled: false },
     grid: { borderColor: "hsl(145 18% 86%)", strokeDashArray: 4 },
-    stroke: { curve: "smooth", width: 2 },
+    stroke: type === "bar" ? { width: 0 } : { curve: "smooth", width: 2 },
+    plotOptions: type === "bar" ? { bar: { borderRadius: 4, columnWidth: "55%" } } : undefined,
     xaxis: {
       categories,
       labels: { style: { colors: "hsl(150 8% 43%)" } },
@@ -33,5 +41,5 @@ export function ReportChart({ categories, series, height = 260 }: ReportChartPro
     tooltip: { theme: "light" },
   };
 
-  return <Chart height={height} options={options} series={series} type="area" />;
+  return <Chart height={height} options={options} series={series} type={type} />;
 }

@@ -1,8 +1,37 @@
+import { ReportChart } from "@/component/widget/report_chart";
+
 import type { BkdLaporanAkhirResponse } from "../api/bkd_schemas";
 
 type BkdSummaryWidgetProps = {
   items: BkdLaporanAkhirResponse["items"];
 };
+
+const sksCategories = ["Ajar", "Didik", "Lit", "Pengmas", "Penunjang"];
+
+function toSksSeries(item: BkdLaporanAkhirResponse["items"][number]) {
+  return [
+    {
+      name: "Kinerja",
+      data: [
+        item.sks_kinerja_ajar,
+        item.sks_kinerja_didik,
+        item.sks_kinerja_lit,
+        item.sks_kinerja_pengmas,
+        item.sks_kinerja_penunjang,
+      ],
+    },
+    {
+      name: "Lebih",
+      data: [
+        item.sks_lebih_ajar,
+        item.sks_lebih_didik,
+        item.sks_lebih_lit,
+        item.sks_lebih_pengmas,
+        item.sks_lebih_tunjang,
+      ],
+    },
+  ];
+}
 
 export function BkdSummaryWidget({ items }: BkdSummaryWidgetProps) {
   return (
@@ -54,6 +83,13 @@ export function BkdSummaryWidget({ items }: BkdSummaryWidgetProps) {
             <SummaryField label="ID jabfung" value={formatNumber(item.id_jabfung)} />
             <SummaryField label="Simpulan asesor" value={item.simpulan_asesor} />
           </dl>
+
+          <div className="mt-5 border-t border-[hsl(var(--color-border))] pt-4">
+            <p className="text-xs font-semibold text-[hsl(var(--color-text))]">
+              SKS kinerja vs lebih per unsur
+            </p>
+            <ReportChart categories={sksCategories} series={toSksSeries(item)} type="bar" />
+          </div>
         </article>
       ))}
     </div>
