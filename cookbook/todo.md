@@ -354,6 +354,23 @@ masing-masing dengan commit terpisah.
       atas Tabs baru; verifikasi dilakukan lewat source review, typecheck,
       dan pemanggilan endpoint tRPC yang mendasari tiap tab secara langsung.
 
+## SISTER HTTP client SSRF checkpoint: 2026-09-18
+
+- [x] `sisterGet`/`buildSisterUrl` (`src/server/sister/http_client.ts`) menolak
+      path adapter yang tidak diawali `/`, menolak path relative-protocol
+      (`//host/...`) yang resolve ke origin berbeda dari `base_url`
+      terkonfigurasi, hanya mengizinkan `https:`, dan memakai `redirect:
+      "error"` sehingga tidak ada redirect outbound yang diikuti otomatis.
+- [x] `src/server/sister/http_client.test.ts` (baru, 8 test) memverifikasi
+      guard tersebut, header `Authorization: Bearer`, query yang mengirim
+      hanya nilai terdefinisi, serta error mapping untuk 204, non-JSON,
+      body tidak valid, status non-2xx, dan response yang tidak sesuai
+      schema.
+- [ ] Validasi ini tidak memblokir base_url yang sudah dikonfigurasi ke IP
+      internal/private (SSRF via misconfigured env var); `base_url` tetap
+      dipercaya sebagai nilai server-side, bukan input pengguna. DNS
+      rebinding protection belum ditambahkan.
+
 ## 0. Gate kontrak eksternal
 
 - [ ] Identifikasi perguruan tinggi target dan instance SISTER yang akan dipakai.
@@ -483,8 +500,8 @@ library atau tabel sudah dibuat.
 - [ ] Uji bahwa output tRPC tidak mengandung token, secret, raw Prisma object,
       atau PII yang tidak dibutuhkan.
 - [ ] Tambahkan timeout yang dikonfirmasi pada gate kontrak.
-- [ ] Tambahkan SSRF protection dengan allowlist base URL.
-- [ ] Validasi scheme/host/IP dan matikan redirect outbound yang tidak diperlukan.
+- [x] Tambahkan SSRF protection dengan allowlist base URL.
+- [x] Validasi scheme/host/IP dan matikan redirect outbound yang tidak diperlukan.
 - [ ] Pastikan route internal tidak menerima arbitrary path proxy.
 
 ### 3.1 Boundary debugging
