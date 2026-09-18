@@ -447,6 +447,23 @@ masing-masing dengan commit terpisah.
       di halaman manapun karena belum ada fitur yang butuh granularitas itu.
       Item checklist ini masih dianggap belum selesai.
 
+## Bounded GET retry checkpoint: 2026-09-18
+
+- [x] `sisterGet` (`src/server/sister/http_client.ts`) sekarang membungkus
+      `fetch` dengan `fetchWithBoundedRetry`: maksimal 3 percobaan dengan
+      jeda 200ms/400ms, dan hanya retry saat `fetch` sendiri throw (network
+      failure/DNS/timeout abort) — bukan saat response sudah diterima,
+      termasuk response error 4xx/5xx yang tetap dianggap jawaban final dan
+      tidak di-retry.
+- [x] Tidak ada perubahan pada mutation karena belum ada endpoint write;
+      begitu ada mutation, kontrak `architecture.md` ("POST/PUT/DELETE tidak
+      boleh di-retry otomatis") tetap berlaku dan `fetchWithBoundedRetry`
+      sengaja hanya dipakai di jalur `sisterGet`, bukan jalur POST/PUT/DELETE
+      di masa depan.
+- [x] 3 test baru di `http_client.test.ts` (retry lalu berhasil, retry habis
+      lalu throw, tidak retry setelah response non-2xx diterima) lulus lewat
+      `bunx vitest run`.
+
 ## 0. Gate kontrak eksternal
 
 - [ ] Identifikasi perguruan tinggi target dan instance SISTER yang akan dipakai.
@@ -563,9 +580,9 @@ library atau tabel sudah dibuat.
 - [x] Pastikan output tRPC berupa DTO yang aman dan tidak mengembalikan object
       Prisma mentah, bearer token, atau response sensitif penuh.
 - [ ] Gunakan Route Handler khusus untuk upload multipart dan download binary.
-- [ ] Implementasikan parsing response 200, 204, dan error message/detail.
-- [ ] Implementasikan bounded retry untuk GET yang aman.
-- [ ] Blokir automatic retry untuk POST, PUT, dan DELETE yang hasilnya tidak
+- [x] Implementasikan parsing response 200, 204, dan error message/detail.
+- [x] Implementasikan bounded retry untuk GET yang aman.
+- [x] Blokir automatic retry untuk POST, PUT, dan DELETE yang hasilnya tidak
       pasti.
 - [ ] Implementasikan request fingerprint lokal.
 - [ ] Redact credential, token, dan PII pada structured log.

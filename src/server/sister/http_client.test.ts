@@ -173,4 +173,45 @@ describe("sisterGet", () => {
       SisterContractError,
     );
   });
+
+  it("retries a GET that fails at the network level and succeeds once fetch recovers", async () => {
+    getSisterConfigMock.mockReturnValue(liveConfig);
+    getSisterTokenMock.mockResolvedValue({ token: "tok", role: "WS-BASIC", expires_at: 0 });
+    const fetchMock = vi
+      .fn()
+      .mockRejectedValueOnce(new TypeError("network error"))
+      .mockRejectedValueOnce(new TypeError("network error"))
+      .mockResolvedValueOnce(jsonResponse(200, [{ id: "1" }]));
+    vi.stubGlobal("fetch", fetchMock);
+
+    const result = await sisterGet({ path: "/referensi/semester", schema: itemSchema });
+
+    expect(result).toEqual([{ id: "1" }]);
+    expect(fetchMock).toHaveBeenCalledTimes(3);
+  }, 10_000);
+
+  it("gives up after the bounded number of network-level retries", async () => {
+    getSisterConfigMock.mockReturnValue(liveConfig);
+    getSisterTokenMock.mockResolvedValue({ token: "tok", role: "WS-BASIC", expires_at: 0 });
+    const networkError = new TypeError("network error");
+    const fetchMock = vi.fn().mockRejectedValue(networkError);
+    vi.stubGlobal("fetch", fetchMock);
+
+    await expect(
+      sisterGet({ path: "/referensi/semester", schema: itemSchema }),
+    ).rejects.toThrow("network error");
+    expect(fetchMock).toHaveBeenCalledTimes(3);
+  }, 10_000);
+
+  it("does not retry once a response is actually received, even a non-2xx one", async () => {
+    getSisterConfigMock.mockReturnValue(liveConfig);
+    getSisterTokenMock.mockResolvedValue({ token: "tok", role: "WS-BASIC", expires_at: 0 });
+    const fetchMock = vi.fn().mockResolvedValue(jsonResponse(500, { message: "Server error" }));
+    vi.stubGlobal("fetch", fetchMock);
+
+    await expect(
+      sisterGet({ path: "/referensi/semester", schema: itemSchema }),
+    ).rejects.toBeInstanceOf(SisterApiError);
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+  });
 });

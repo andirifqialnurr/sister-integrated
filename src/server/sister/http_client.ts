@@ -10,6 +10,33 @@ type RequestOptions<T> = {
   schema: ZodType<T>;
 };
 
+const maxFetchAttempts = 3;
+const retryDelayMs = 200;
+
+function wait(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+// GET is safe to retry; this only retries when fetch itself throws (network
+// failure, DNS error, timeout abort), never after a response is received —
+// an HTTP error status is a completed, non-retriable answer from SISTER.
+async function fetchWithBoundedRetry(url: URL, init: RequestInit): Promise<Response> {
+  let lastError: unknown;
+
+  for (let attempt = 1; attempt <= maxFetchAttempts; attempt += 1) {
+    try {
+      return await fetch(url, init);
+    } catch (error) {
+      lastError = error;
+      if (attempt < maxFetchAttempts) {
+        await wait(retryDelayMs * attempt);
+      }
+    }
+  }
+
+  throw lastError;
+}
+
 function buildSisterUrl(baseUrl: string, path: string, query?: RequestOptions<unknown>["query"]) {
   if (!path.startsWith("/")) {
     throw new Error("SISTER adapter paths must be absolute API paths");
@@ -37,7 +64,7 @@ export async function sisterGet<T>({ path, query, schema }: RequestOptions<T>): 
   }
 
   const token = await getSisterToken();
-  const response = await fetch(buildSisterUrl(config.base_url, path, query), {
+  const response = await fetchWithBoundedRetry(buildSisterUrl(config.base_url, path, query), {
     method: "GET",
     headers: {
       accept: "application/json",
