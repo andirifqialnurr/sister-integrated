@@ -4,6 +4,7 @@ import type { TRPCClientErrorLike } from "@trpc/client";
 import type { UseQueryResult } from "@tanstack/react-query";
 
 import { Button } from "@/component/ui/button";
+import { DataFreshness } from "@/component/ui/data_freshness";
 import { State } from "@/component/ui/state";
 import type { AppRouter } from "@/server/trpc/router";
 
@@ -40,9 +41,12 @@ export function PegawaiSearchResults({ query }: PegawaiSearchResultsProps) {
 
       {query.data && (
         <>
-          <p className="text-xs text-[hsl(var(--color-muted))]">
-            Menampilkan {query.data.items.length} dari {query.data.total} pegawai
-          </p>
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <p className="text-xs text-[hsl(var(--color-muted))]">
+              Menampilkan {query.data.items.length} dari {query.data.total} pegawai
+            </p>
+            <DataFreshness dataUpdatedAt={query.dataUpdatedAt} />
+          </div>
           {query.data.items.length > 0 ? (
             <PegawaiResultsTable items={query.data.items} />
           ) : (

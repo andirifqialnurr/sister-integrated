@@ -4,6 +4,7 @@ import { Building2, CalendarDays, MapPin, RefreshCw, Building } from "lucide-rea
 import { useQuery } from "@tanstack/react-query";
 
 import { Button } from "@/component/ui/button";
+import { DataFreshness } from "@/component/ui/data_freshness";
 import { PageShell } from "@/component/ui/page_shell";
 import { State } from "@/component/ui/state";
 import { useTRPC } from "@/lib/trpc";
@@ -57,6 +58,9 @@ export function ReferensiPage() {
         <article className="min-w-0 rounded-xl border border-[hsl(var(--color-border))] bg-white shadow-[0_1px_2px_hsl(145_20%_20%/0.04)]">
           <PanelHeader
             description="GET /referensi/profil_pt - tanpa parameter"
+            freshness={
+              profilPtQuery.data && <DataFreshness dataUpdatedAt={profilPtQuery.dataUpdatedAt} />
+            }
             icon={<Building2 aria-hidden size={17} />}
             title="Profil perguruan tinggi"
           />
@@ -83,6 +87,9 @@ export function ReferensiPage() {
         <article className="min-w-0 rounded-xl border border-[hsl(var(--color-border))] bg-white shadow-[0_1px_2px_hsl(145_20%_20%/0.04)]">
           <PanelHeader
             description="GET /referensi/semester - tanpa parameter"
+            freshness={
+              semesterQuery.data && <DataFreshness dataUpdatedAt={semesterQuery.dataUpdatedAt} />
+            }
             icon={<CalendarDays aria-hidden size={17} />}
             title="Semester"
           />
@@ -134,10 +141,12 @@ export function ReferensiPage() {
 
 function PanelHeader({
   description,
+  freshness,
   icon,
   title,
 }: {
   description: string;
+  freshness?: React.ReactNode;
   icon: React.ReactNode;
   title: string;
 }) {
@@ -152,6 +161,7 @@ function PanelHeader({
           <p className="mt-1 text-xs text-[hsl(var(--color-muted))]">{description}</p>
         </div>
       </div>
+      {freshness && <div className="shrink-0">{freshness}</div>}
     </div>
   );
 }

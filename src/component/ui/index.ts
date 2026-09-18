@@ -1,4 +1,5 @@
 export { Button } from "./button";
+export { DataFreshness } from "./data_freshness";
 export { DatePicker } from "./date_picker";
 export { Dialog } from "./dialog";
 export { HelpTip } from "./help_tip";

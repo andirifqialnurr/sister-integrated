@@ -262,9 +262,13 @@ semantic tone, bukan stale cache indicator.
       memakai tone `forbidden` yang berbeda secara visual dari error umum;
       `NOT_FOUND` memakai tone `unavailable`.
 - [x] `bun run typecheck` dan `bun run lint` lulus setelah refactor.
-- [ ] Stale cache belum memiliki indikator UI; query hanya memakai
-      `staleTime` 60 detik pada `src/lib/trpc.tsx` tanpa badge atau pesan yang
-      terlihat pengguna.
+- [x] Stale cache sekarang punya indikator UI: `component/ui/data_freshness.tsx`
+      (baru, 2026-09-18) menampilkan "Diperbarui X lalu" dari
+      `query.dataUpdatedAt`, plus titik warning dan keterangan tambahan saat
+      umur data melewati `staleTime` 60 detik yang sama dengan
+      `src/lib/trpc.tsx`. Dipasang di hasil pencarian pegawai serta panel
+      Profil PT dan Semester pada `/referensi`; belum dipasang di semua
+      halaman list lain.
 - [ ] Browser QA light/dark pada breakpoint 1280/1024/390/320 belum
       dilakukan untuk perubahan ini.
 
