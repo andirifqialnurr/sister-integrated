@@ -84,6 +84,26 @@ describe("Pendidikan formal schemas", () => {
     ).toMatchObject({ item: { id: idPendidikanFormal, dokumen: detail.dokumen } });
   });
 
+  it("accepts nullable document link and description metadata", () => {
+    const result = pendidikanFormalDetailResponseSchema.parse({
+      item: {
+        ...detail,
+        dokumen: detail.dokumen.map((document) => ({
+          ...document,
+          tautan: null,
+          keterangan: null,
+        })),
+      },
+      source: "sister",
+      fetched_at: fetchedAt,
+    });
+
+    expect(result.item.dokumen[0]).toMatchObject({
+      tautan: null,
+      keterangan: null,
+    });
+  });
+
   it("rejects undocumented fields from the UI DTO", () => {
     const result = pendidikanFormalDetailResponseSchema.safeParse({
       item: { ...detail, internal_note: "must not pass" },

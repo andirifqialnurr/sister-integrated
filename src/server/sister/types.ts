@@ -156,8 +156,8 @@ export const pendidikanFormalDocumentSchema = z
     nama_file: z.string(),
     jenis_file: z.string(),
     tanggal_upload: z.string(),
-    tautan: z.string(),
-    keterangan: z.string(),
+    tautan: nullableText,
+    keterangan: nullableText,
   })
   .passthrough();
 
@@ -210,8 +210,8 @@ export const riwayatPekerjaanDocumentSchema = z
     nama_file: z.string(),
     jenis_file: z.string(),
     tanggal_upload: z.string(),
-    tautan: z.string(),
-    keterangan: z.string(),
+    tautan: nullableText,
+    keterangan: nullableText,
   })
   .passthrough();
 

@@ -78,6 +78,26 @@ describe("Riwayat pekerjaan schemas", () => {
     ).toMatchObject({ item: { id: idRiwayatPekerjaan, dokumen: detail.dokumen } });
   });
 
+  it("accepts nullable document link and description metadata", () => {
+    const result = riwayatPekerjaanDetailResponseSchema.parse({
+      item: {
+        ...detail,
+        dokumen: detail.dokumen.map((document) => ({
+          ...document,
+          tautan: null,
+          keterangan: null,
+        })),
+      },
+      source: "sister",
+      fetched_at: fetchedAt,
+    });
+
+    expect(result.item.dokumen[0]).toMatchObject({
+      tautan: null,
+      keterangan: null,
+    });
+  });
+
   it("rejects undocumented fields from the UI DTO", () => {
     const result = riwayatPekerjaanDetailResponseSchema.safeParse({
       item: { ...detail, internal_note: "must not pass" },
