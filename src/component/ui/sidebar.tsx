@@ -49,6 +49,7 @@ export function Sidebar({ activeLabel = "Ikhtisar" }: { activeLabel?: string }) 
         aria-label={mobileOpen ? "Tutup navigasi" : "Buka navigasi"}
         className="fixed left-4 top-3 z-[60] inline-flex h-10 w-10 items-center justify-center rounded-lg border border-[hsl(var(--color-border))] bg-[hsl(var(--color-surface))] text-[hsl(var(--color-text))] shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--color-primary))] lg:hidden"
         onClick={() => setMobileOpen((isOpen) => !isOpen)}
+        title={mobileOpen ? "Tutup navigasi" : "Buka navigasi"}
         type="button"
       >
         {mobileOpen ? <X aria-hidden size={18} /> : <Menu aria-hidden size={18} />}

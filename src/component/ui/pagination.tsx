@@ -49,6 +49,7 @@ export function Pagination({
         className={buttonClass}
         disabled={disabled || safePage === 1}
         onClick={() => onPageChange(safePage - 1)}
+        title="Halaman sebelumnya"
         type="button"
       >
         <ChevronLeft aria-hidden size={15} />
@@ -82,6 +83,7 @@ export function Pagination({
         className={buttonClass}
         disabled={disabled || safePage === pageCount}
         onClick={() => onPageChange(safePage + 1)}
+        title="Halaman berikutnya"
         type="button"
       >
         <ChevronRight aria-hidden size={15} />
